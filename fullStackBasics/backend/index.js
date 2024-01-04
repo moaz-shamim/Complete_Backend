@@ -13,7 +13,8 @@ app.get("/api/jokes", (req, res) => {
     { id: 3, title: "A third joke", content: "Why did the scarecrow win an award?Because he was outstanding in his field!" },
     { id: 4, title: "A fourth joke", content: "How do you organize a space party?You planet!" },
     { id: 5, title: "A fifth joke", content: "Why did the bicycle fall over?Because it was two-tired!" },
-    { id: 6, title: "A fifth joke", content: "Why did the bicycle stops?Because it need Petrol!" },
+    { id: 6, title: "A sixth joke", content: "Why did the bicycle stops?Because it need Petrol!" },
+    { id: 7, title: "A seventh joke", content: "Dummy Jokes" },
   ];
 
   res.send(jokes)
