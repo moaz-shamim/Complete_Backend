@@ -76,3 +76,12 @@ The .prettierrc file is a configuration file used by the Prettier code formatter
 
 `.prettierignore`
 The .prettierignore file is used to specify files and directories that should be excluded from Prettier formatting. It works similarly to the commonly used .gitignore file but is specific to Prettier.
+
+```js
+{
+  "singleQuote": false,
+  "bracketSpacing": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "semi": true
+}```
