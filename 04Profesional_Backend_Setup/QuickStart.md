@@ -219,8 +219,6 @@ Absolutely, let's break down the "Database Access" section in MongoDB Atlas usin
 
    - By default, "moazshamim1575" can access everything in this project (the whole party), but you can enable this option to be more specific about where they can go.
 
-5. **Cancel and Update User:**
-   - These are like buttons you can press. "Cancel" means you're not making any changes. "Update User" means you're confirming and saving the changes you've made to how "moazshamim1575" can access and interact with the database.
 
 In simpler terms, the "Database Access" section is where you decide who gets special access keys, how they prove they're allowed in, and what specific things they can do at the "party" (or database). It's like setting up security and permissions for different users.
 
@@ -281,3 +279,23 @@ let's simplify the process of connecting to Cluster in MongoDB Atlas:
      - If you change your mind or finish what you were doing, you can go back or close the connection, just like leaving a building and locking the door behind you.
 
 In simple terms, connecting to Cluster is like entering a secure place where your MongoDB data is stored. You can choose how you want to get in, use different tools to explore and work with your data, and when you're done, you can leave or close the connection.
+
+### Connecting with MongoDB Compass:
+
+When you click Connecting with MongoDB Compass , MongoDB Atlas provide you a connection string from which you connect to your Clusters(DataBase)
+
+The connection string you see is like a secret code that helps your computer talk to the MongoDB database in the cloud (Cluster0). Let's break it down:
+
+1. `mongodb+srv://`: This is just a way of saying, "Hey, I want to connect to a MongoDB server!"
+
+2. `moazshamim1575`: This is the username you'll use to log in.
+
+3. `<password>`: You need to replace this with the actual password for the user 'moazshamim1575'.
+
+4. `@cluster0.gwa9zwr.mongodb.net/`: This is the address of the MongoDB server. It's like telling your computer where to find the database. In this case, it's Cluster0 in the MongoDB cloud.
+
+So, when you put it all together, it's like telling your computer, "Connect to MongoDB using the username 'moazshamim1575', with this password, and find the database in Cluster0 in the MongoDB cloud."
+
+Make sure to replace `<password>` with the real password, and then you can use this code to connect your computer to the MongoDB database!
+
+You can use this connection string in the env file of your project to connect your project from DataBase. 
