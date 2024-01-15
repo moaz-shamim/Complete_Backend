@@ -369,3 +369,9 @@ For that, we go to the package.json file and navigate to where you write the "de
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
 
+
+ ### `connectedDB`
+
+"Remember that we created a `connectedDB` function asynchronously, so we use `dot then` and `catch` from where we call `connectdb`. we call it in index.js 
+
+Keep in mind that when an asynchronous task is completed, it returns promises."
