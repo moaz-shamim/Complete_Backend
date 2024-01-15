@@ -375,3 +375,27 @@ For that, we go to the package.json file and navigate to where you write the "de
 "Remember that we created a `connectedDB` function asynchronously, so we use `dot then` and `catch` from where we call `connectdb`. we call it in index.js 
 
 Keep in mind that when an asynchronous task is completed, it returns promises."
+
+Here in the .then  part of the promise we use express event listeners for errors and also we start a server by using a listen method  
+
+```javascript
+app.on("error", () => {
+  console.log("Express Error ::App DataBase Connection  :: error", error);
+  throw error;
+});
+```
+
+This code is setting up an event listener for errors in the Express application. Let's go through each part:
+
+1. **`app.on("error", () => {...}`:**
+   - This line is saying, "Listen for the 'error' event on the Express app." In programming, an event is like a signal that something specific has happened.
+
+2. **`console.log("Express Error ::App DataBase Connection  :: error", error);`:**
+   - When an error event occurs, this line logs a message to the console. The message includes information about the type of error, like "Express Error ::App DataBase Connection," and the details of the error.
+
+3. **`throw error;`:**
+   - This line throws an error, which means it stops the normal flow of the program and jumps to the nearest error-handling code (like a `catch` block if it's inside a `try-catch` statement).
+   - Throwing an error is a way of saying, "Something unexpected happened, and we can't continue as usual."
+
+In simple terms, this part of the code is saying, "If there's an error in the Express application, log the details of the error, and then stop everything because we can't proceed safely." It's a way to catch and handle errors in the application so that developers can be aware of issues during development or maintenance.
+

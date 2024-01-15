@@ -18,7 +18,7 @@ const app = express();
   try {
     await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`);
 
-    app.on("error", () => {
+    app.on("error", (error) => {
       console.log("Express Error ::App DataBase Connection  :: error", error);
       throw error;
     });
@@ -35,7 +35,7 @@ const app = express();
 
 connectDB()
   .then(() => {
-    app.on("error", () => {
+    app.on("error", (error) => {
       console.log("Express Error ::App DataBase Connection  :: error", error);
       throw error;
     });
