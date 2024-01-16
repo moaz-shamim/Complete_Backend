@@ -711,3 +711,132 @@ So, this line is essentially saying, "Use the cookie parser middleware to handle
 
 
 
+## Now we learn the concept of middleware's:
+
+1. Previously, you wrote a code with `app.get()` where inside, a callback function was explained. This function details how to send a response when someone visits the server.
+
+2. Understanding this concept is crucial because it forms the foundation for learning about middleware.
+
+3. When a client hits a specific URL, like `/moaz`, your server is instructed to send a response using `app.send()`.
+
+4. However, it's not as straightforward as just sending a response. There is some processing involved. You don't want everyone who visits your URL to get a response. Therefore, checks are implemented.
+
+5. These checks are known as `middlewares`. They act as intermediaries between the incoming request and the server's response. 
+
+6. In the case of your example, the middleware checks if the requester is authenticated. If they are, the server proceeds with sending the response; otherwise, access may be denied.
+
+_The next in the img2 to is related to middleware next is only a flag when the work of first middleware is completed then it pass the flags to next mideliver and last is send response._
+
+## Now we set up some of our utilities that help us to create a clean codeflow:
+
+"We consistently interact with the database in various controllers, such as the user controller or video controller. Writing database connection and configuration code each time can be repetitive. To address this, we create a utility file to house a generalized function. This function allows anyone wanting to communicate with the database to pass their specific function to our utility. The generalized function then executes the database configuration code and functions, returning the result.
+
+This practice is common in the industry. You can create this utility inside a 'service' folder, and you're free to name it as you prefer.
+
+In our example, we've created an `asynchandler.js` file in the 'utils' folder to house this utility. The utility accommodates both promise and async/await methods, as database connections can take time. We cover both methods to cater to different preferences in the development process."
+
+***
+
+**1st async/await method**
+
+Certainly! Let's break down the `asyncHandler` function in easy language:
+
+```javascript
+const asyncHandler = (fn) => async (req, res, next) => {
+  try {
+    await fn(req, res, next);
+  } catch (error) {
+    res.status(err.code || 500).json({
+      success: false,
+      message: err.message
+    });
+  }
+};
+```
+
+1. **`const asyncHandler = (fn) => async (req, res, next) => { ... }`**:
+   - This creates a function called `asyncHandler`.
+   - It takes another function (`fn`) as an argument.
+   - It returns a new function that accepts `req`, `res`, and `next` parameters.
+
+2. **`try { await fn(req, res, next); }`**:
+   - Inside this function, it tries to execute the provided function (`fn`) with `await`.
+   - The `await` keyword is used with asynchronous functions to wait for them to complete before moving on.
+
+3. **`catch (error) { ... }`**:
+   - If there's an error during the execution of the function, it catches the error.
+   - It then sends a JSON response with an appropriate status code (taken from the error's `code` property or defaulting to 500) and a message indicating the failure.
+
+So, in simpler terms, `asyncHandler` is a utility function that helps handle asynchronous functions used in Express middleware. It wraps the provided function, catches any errors that occur during its execution, and sends a meaningful JSON response if there's an error. This helps to centralize error handling for asynchronous operations in your Express application.
+
+
+***
+**res.status(code)**
+
+1. **HTTP Status:**
+   - When your server responds to a request, it includes an HTTP status code in the response. This code indicates the outcome of the request—whether it was successful, encountered an error, or needs further action.
+  
+2. **`res.status(code)`:**
+   - In Express.js (a web application framework for Node.js), when you handle a request, you use the `res` (response) object to send a response back to the client.
+   - The `res.status(code)` method is used to set the HTTP status code for that response.
+
+3. **Chainable Alias:**
+   - The term "chainable" means you can chain this method with other methods.
+   - For example, you might want to set the status code and send a message in the same line of code.
+   - Chaining allows you to perform multiple operations on the response object in a single statement.
+
+4. **Node’s Alias:**
+   - It's mentioned as an "alias of Node’s" because Express.js is built on top of Node.js, and it often exposes methods that have aliases or similar functionalities from the underlying Node.js core.
+
+In simple terms:
+- `res.status(code)` is a way to tell the client about the outcome of their request.
+- You can chain it with other methods to streamline your code.
+- It's similar to how Node.js itself handles HTTP responses, and Express.js provides a convenient way to work with it.
+
+***
+
+Certainly! Let's break down `res.status(err.code || 500).json({ success: false, message: err.message });` in easy language:
+
+1. **`res.status(err.code || 500)`**:
+   - This part sets the HTTP status code for the response.
+   - It uses `err.code` if it exists, otherwise defaults to 500 (Internal Server Error).
+   - It's like saying, "Set the HTTP status code based on the error code, or use 500 if there is no specific error code."
+
+2. **`.json({ success: false, message: err.message })`**:
+   - This part sends a JSON response with two properties: `success` and `message`.
+   - `success: false` indicates that the operation was not successful.
+   - `message: err.message` provides a descriptive message about the error.
+
+So, in simpler terms, this line of code is creating a response that communicates whether an operation was successful or not. If there's an error, it sets an appropriate HTTP status code and sends a JSON response with details about the error, including a descriptive message.
+
+***
+
+**2nd promise method**
+
+Certainly! Let's break down the `asyncHandler` function in easy language:
+
+```javascript
+const asyncHandler = (requestHandler) => {
+  (req, res, next) => {
+    Promise.resolve(requestHandler(req, res, next))
+      .catch((err) => next(err));
+  }
+};
+```
+
+1. **`const asyncHandler = (requestHandler) => { ... }`**:
+   - This creates a function called `asyncHandler`.
+   - It takes another function (`requestHandler`) as an argument.
+
+2. **`(req, res, next) => { ... }`**:
+   - This is an anonymous function that takes three parameters: `req` (request), `res` (response), and `next` (a function to pass control to the next middleware/route).
+
+3. **`Promise.resolve(requestHandler(req, res, next))`**:
+   - It takes the result of calling `requestHandler(req, res, next)` and wraps it in a resolved Promise.
+   - This is useful for handling asynchronous operations.
+
+4. **`.catch((err) => next(err))`**:
+   - If there's an error during the execution of `requestHandler`, the `catch` block is triggered.
+   - It calls `next(err)`, which passes the error to the next middleware or route in the sequence.
+
+So, in simpler terms, `asyncHandler` is a utility function that wraps around another function (`requestHandler`). It ensures that any errors that occur during the execution of `requestHandler` are caught and passed to the next middleware or route. This is especially useful when dealing with asynchronous code.
