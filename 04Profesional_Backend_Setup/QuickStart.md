@@ -399,3 +399,315 @@ This code is setting up an event listener for errors in the Express application.
 
 In simple terms, this part of the code is saying, "If there's an error in the Express application, log the details of the error, and then stop everything because we can't proceed safely." It's a way to catch and handle errors in the application so that developers can be aware of issues during development or maintenance.
 
+## Now we go to the documentation of ExpressJS we mainly focus on two things in the docs first is request and second is response 
+
+**`req` object in Express.js:**
+
+In Express.js, when your server receives a request (like someone visiting a webpage or making an API call), it gets a special object called `req`, which stands for "request." This object has a bunch of information about the request, and it's like a package that holds details about what the person or system is asking for.
+
+Here are the key points:
+
+1. **HTTP Request Information:**
+   - The `req` object contains information about the request. This includes things like what URL was requested, any data that was sent along (like in a form or in the body of the request), and details about the type of request (GET, POST, etc.).
+
+2. **Properties of the `req` Object:**
+   - The `req` object has various properties that give you specific information about the request. For example:
+     - `req.params`: This holds any parameters in the URL. In the example, `req.params.id` would give you the value of `id` from the URL.
+     - `req.query`: This contains any parameters in the query string of the URL.
+     - `req.body`: If the request includes data in the body (common in POST requests), you can access it through `req.body`.
+
+3. **Callback Function Parameters:**
+   - When you create routes in Express, you often define a function (callback) to handle what should happen when that route is accessed. In that function, you can name the `req` object whatever you like. Conventionally, it's named `req`, but you can call it anything. The important part is the information it carries.
+
+4. **Enhanced Version of Node's Request Object:**
+   - The `req` object in Express is like a supercharged version of Node.js's own request object. It has additional features and methods that make it easier to work with when building web applications.
+
+In simpler terms, when someone asks your server for something (like a webpage or data), the server gets a special package called `req` that tells it exactly what the person wants and provides all the details needed to handle that request. Developers can then use the information in the `req` object to customize their server's response.
+
+***
+
+**We mainly focus on some `property of the request object`  in like a request.params, request.body, request.cookies**
+
+**Let's break down the concept of `req.params property of the request object`  in Express.js in easy language:**
+
+In Express.js, when your server receives a request, it often includes information in the URL. The `req.params` is like a special box that holds these pieces of information, specifically the parts of the URL that are defined as parameters.
+
+Here are the key points:
+
+1. **URL Parameters:**
+   - When you define a route with parameters in Express, like `/user/:name`, it means that someone can visit a URL like `/user/tj`. The `req.params` object holds these values.
+
+2. **Properties in `req.params`:**
+   - If you have a route like `/user/:name`, then `req.params.name` will give you the value of the `name` parameter. In the example, if someone visits `/user/tj`, `req.params.name` will be "tj".
+
+3. **Regular Expressions and Capture Groups:**
+   - If you use a regular expression in your route definition or have wildcard matches, like `/file/*`, the captured values are available in the `req.params` array. For example, if someone requests `/file/javascripts/jquery.js`, `req.params[0]` will be "javascripts/jquery.js".
+
+4. **Changing `req.params`:**
+   - If you need to make changes to a key in `req.params`, you can use the `app.param` handler. However, these changes only affect parameters already defined in the route path.
+
+5. **Automatic Decoding:**
+   - Express automatically decodes the values in `req.params`. This means that if values are URL-encoded (e.g., spaces represented as `%20`), Express decodes them to their original form.
+
+6. **Middleware and Route Handler Reset:**
+   - Any changes made to the `req.params` object in a middleware or route handler will be reset after the request is processed. It's like a temporary space used during the handling of a specific request.
+
+In simpler terms, `req.params` is like a box that holds pieces of information from the URL. It's useful when you want to capture specific values (parameters) from the URL and use them in your server logic.
+
+***
+
+**Let's break down the concept of `req.body property of req object` in Express.js and body-parsing middleware in easy language:**
+
+In Express.js, when someone sends data to your server (for example, when submitting a form on a website), that data is often included in the request body. The `req.body` is like a container that holds all the key-value pairs of this submitted data.
+
+Here are the key points:
+
+1. **Submitted Data:**
+   - When someone interacts with your website or application, they might submit data, like filling out a form or sending information. This data is sent in the request body.
+
+2. **`req.body` in Express:**
+   - The `req.body` object in Express holds all the data submitted in the request body. It's like a bag that keeps all the information neatly organized.
+
+3. **Default Value and Middleware:**
+   - By default, when a request arrives, `req.body` is undefined. To populate it with the submitted data, you need to use body-parsing middleware. Middleware is like a set of tools that help process incoming requests.
+
+4. **Validation is Important:**
+   - Since the data in `req.body` comes from users who can manipulate it, it's essential to validate it before trusting or using it in your application. Validation ensures that the data is in the expected format and prevents potential issues.
+
+5. **Example Using Middleware:**
+   - The provided example shows how to use two popular body-parsing middleware packages: `body-parser` and `multer`. These packages help parse different types of data, such as JSON and form-urlencoded data.
+
+   - In the example:
+     - `bodyParser.json()` is for parsing JSON data.
+     - `bodyParser.urlencoded({ extended: true })` is for parsing form-urlencoded data.
+     - `multer()` is for parsing multipart/form-data, often used for file uploads.
+
+   - The `app.post('/profile', upload.array(), ...)` route is an example where data is posted to the server, and `console.log(req.body)` prints the submitted data to the console.
+
+In simpler terms, `req.body` is like a container that holds all the information someone sends to your server. To use this data effectively, you need to use middleware tools like `body-parser` and `multer`. Always validate the data in `req.body` to ensure it's safe and in the expected format.
+
+***
+
+**Let's break down the concept of `req.cookies property of req object` in Express.js with the help of the `cookie-parser` middleware:**
+
+When someone visits a website, the server can send back small pieces of data to be stored on the visitor's browser. These are called cookies, and they help the server remember information about the user. The `req.cookies` in Express.js is like a container that holds these cookies when the server receives a request.
+
+Here are the key points:
+
+1. **Cookies and `cookie-parser`:**
+   - Cookies are tiny pieces of data sent by a website and stored on the user's browser. They can contain information like user preferences or session details.
+   - To work with cookies in Express, developers often use a middleware called `cookie-parser`.
+
+2. **`req.cookies` Object:**
+   - When the `cookie-parser` middleware is used, the `req.cookies` object is created. It's like a collection that stores all the cookies sent by the user's browser.
+
+3. **Accessing Cookie Values:**
+   - You can access specific cookie values using the cookie's name as a property of `req.cookies`. For example:
+     ```javascript
+     // If the request includes a cookie named 'name'
+     console.dir(req.cookies.name); // Outputs the value of the 'name' cookie
+     ```
+
+4. **Handling Signed Cookies:**
+   - If cookies are signed for additional security, you should use `req.signedCookies` instead of `req.cookies`. Signed cookies are cookies that have been encrypted, and they are verified by the server.
+
+5. **Example:**
+   - If a user sends a request with a cookie like `Cookie: name=tj`, `req.cookies.name` will give you the value "tj".
+
+In simpler terms, `req.cookies` is like a bag that holds all the cookies a user sent with their request. These cookies can contain information that helps the server remember things about the user. Using `cookie-parser` middleware makes it easy to work with these cookies in your Express.js application.
+
+***
+
+**Configuring in Express**
+
+Configuring in Express refers to setting up or adjusting various settings and options for your Express application. It involves providing specific instructions to customize the behavior and functionality of your server.
+
+In simpler terms, when you configure your Express application, you are telling it how to handle certain aspects, such as:
+
+1. **Middleware:** You configure which middleware functions should be used and in what order. Middleware functions can handle tasks like logging, data parsing, authentication, etc.
+
+2. **Routes:** You set up routes to define how your application responds to different types of requests. Each route is configured to handle specific HTTP methods and paths.
+
+3. **Settings:** You can configure various settings for your application, such as the view engine, static file directories, and more.
+
+4. **Environment:** Express allows you to configure your application differently based on the environment it's running in (development, production, testing).
+
+Configuring in Express is about tailoring your application to behave the way you want it to, based on your specific requirements and preferences. It provides a flexible and customizable framework to build web applications.
+
+***
+
+**parsing in Express**
+
+In the context of Express, parsing usually refers to the process of extracting and interpreting data from incoming requests. When a client sends data to your server, it's often in the form of a request, and this data needs to be understood by your server.
+
+For example, when you submit a form on a website, the data from that form (like the information you typed into text fields) needs to be "parsed" by Express. Express uses middleware (like `body-parser` or the built-in `express.json()` middleware) to parse this incoming data and make it accessible to your server-side code.
+
+So, parsing in Express is like unwrapping the data sent from a client so that your server can understand and work with it easily.
+
+
+***
+
+**middleware in Express**
+
+In Express, middleware is like a set of tools or functions that help process and manage incoming requests and outgoing responses. Imagine a request is like a package traveling through a series of stops (middlewares) before reaching its final destination (your application's route handler).
+
+Middleware functions have access to the request object (`req`), the response object (`res`), and the `next` function in the application’s request-response cycle. They can perform tasks such as modifying the request or response, ending the request-response cycle, and calling the next middleware in the stack.
+
+Here's a simple analogy: think of your Express application as a highway for requests. Middleware acts like toll booths along the highway. Each toll booth can inspect, modify, or even block the incoming cars (requests) before allowing them to proceed further down the highway.
+
+Common uses for middleware include handling data parsing, logging, authentication, and more. They enhance the functionality and structure of your Express application by breaking down tasks into manageable and reusable components.
+
+***
+
+**various properties and methods in Express for configuration**
+
+In Express, configuration is often done through various properties and methods. Some commonly used properties for configuring an Express application include:
+
+1. **`app.set(name, value)`**: This method is used to set application-level settings. For example:
+   ```javascript
+   app.set('view engine', 'ejs');
+   ```
+
+2. **`app.use([path,] callback [, callback...])`**: The `app.use()` method is used to mount middleware functions. Middleware functions are a way to configure how your application handles requests. For example:
+   ```javascript
+   app.use(express.json());
+   ```
+   app.use(): This is a method in Express that is used to set up middleware functions. Middleware functions are like helpers that can perform tasks when a request comes in.
+
+3. **`app.locals`**: An object that can be used to store variables that are local to the application. These variables can be accessed within templates or route handlers.
+
+4. **`app.engine`**: Configures the template engine for rendering views. For example:
+   ```javascript
+   app.engine('html', require('ejs').renderFile);
+   ```
+
+5. **`app.set('env', 'development')`**: Sets the environment mode for your application. The environment can be 'development', 'production', or 'testing', and certain configurations may vary based on the environment.
+
+These are just a few examples, and the choice of properties/methods depends on what aspect of the application you are configuring (e.g., middleware, views, environment, etc.). The official Express documentation is a great resource for understanding all available options for configuration: [Express Application settings](https://expressjs.com/en/api.html#app.settings).
+
+***
+
+## Now we install and discuss on some packages like cookie parser and CORS:
+
+_We use , app.use(): This is a method in Express that is used to set up middleware functions. Middleware functions are like helpers that can perform tasks when a request comes in._
+
+"We import CORS and Cookie Parser in the `app.js` file. Now, let's review the CORS configuration. Additionally, we'll examine some settings before the cookie options."
+
+Certainly! Let's break down the provided code in easy language:
+
+```javascript
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
+```
+
+This code is configuring Cross-Origin Resource Sharing (CORS) for an Express.js application. Let's understand what each part does:
+
+1. **`app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }))`:**
+   - This line tells Express to use the `cors` middleware for all routes in the application.
+   - `cors` is a middleware that helps in handling CORS-related issues, allowing or restricting access to resources on your server from different origins (websites).
+  
+2. **`origin: process.env.CORS_ORIGIN`:**
+   - The `origin` option in `cors` determines which origins (websites) are allowed to access the resources on your server.
+   - `process.env.CORS_ORIGIN` refers to an environment variable that should contain the allowed origin. This allows you to dynamically set the allowed origin based on your environment.
+
+3. **`credentials: true`:**
+   - The `credentials` option is set to `true`. This means that the server allows the browser to include credentials (like cookies or HTTP authentication) in the cross-origin request.
+   - It's essential when your application involves authentication or when you want to send and receive cookies across different domains.
+
+In simple terms, this configuration is saying:
+- Allow requests from the origin specified in the `CORS_ORIGIN` environment variable.
+- Allow credentials to be included in cross-origin requests.
+
+By using this setup, the Express application is ready to handle cross-origin requests in a secure and controlled manner, ensuring that only specified origins are allowed, and credentials can be included when necessary.
+
+***
+
+If you set `CORS_ORIGIN` to `"*"` (wildcard) in your environment variable, it means that you are allowing any origin to make cross-origin requests to your server. Let's break down the implications:
+
+```javascript
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
+```
+
+1. **`origin: process.env.CORS_ORIGIN`:**
+   - In this case, `process.env.CORS_ORIGIN` would be set to `"*"` (wildcard), meaning any origin is allowed to access your server's resources.
+
+2. **`credentials: true`:**
+   - Despite using a wildcard for the origin, you have set `credentials` to `true`, which means the server allows the inclusion of credentials (like cookies or HTTP authentication) in the cross-origin request.
+
+Implications:
+- **Any Origin Allowed:** Allowing any origin (`"*"`) can be a security risk, as it opens up your server to potential abuse from any website. This is generally not recommended unless you have a specific reason for it.
+
+- **Credentials Allowed:** Allowing credentials with a wildcard origin might introduce security vulnerabilities, as it permits any website to send and receive sensitive information like cookies. Be cautious with this setting, especially if your application involves authentication.
+
+- **CORS Security:** Cross-Origin Resource Sharing (CORS) is a security feature implemented by web browsers to restrict web pages from making requests to a different domain than the one that served the web page. While using a wildcard allows any origin, it might not adhere to the best security practices.
+
+In summary, using `CORS_ORIGIN = "*"` allows any website to access your server's resources, and it's important to carefully consider the security implications, especially if your application involves sensitive data or authentication. It's usually recommended to specify specific origins rather than using a wildcard, whenever possible.
+
+***
+**"We know that in our backend, data comes from various sources such as URLs, JSON requests, and bodies like form submissions. Here, we'll discuss some good practices to handle all these situations."**
+
+
+**Now we do some configuration and set up middlewares**
+
+
+***When we get data in JSON format***
+
+Certainly! In easy language, `app.use(express.json({limit: "16kb"}))` in Express is like setting a rule for your server to handle incoming data.
+
+- **`express.json()`**: This is a middleware in Express that helps your server understand and work with data that comes in JSON format. For example, when someone submits a form on a website, the data is often sent in JSON format.
+
+- **`{limit: "16kb"}`**: This part is setting a limit on how big that JSON data can be. In this case, it's saying, "Hey, if someone sends JSON data to my server, make sure it's not larger than 16 kilobytes (16kb)."
+
+So, this line is essentially saying, "Use the middleware to handle JSON data, but don't accept JSON data larger than 16kb." It's a way to control the size of the data your server is willing to accept in a JSON format.
+
+
+***
+***When we get data through URL***
+
+Sure, let's break down `app.use(express.urlencoded({extended: true, limit: "16kb"}))` in easy language:
+
+- **`express.urlencoded()`**: This is another middleware in Express. It helps your server handle data when it comes from HTML forms. When you submit a form on a website, the data is usually sent as URL-encoded data.
+
+- **`{extended: true, limit: "16kb"}`**: Here, you are setting some options for how the server should handle this URL-encoded data.
+  - `extended: true`: This option allows for parsing complex objects in the URL-encoded data.
+  - `limit: "16kb"`: Similar to the previous explanation, it sets a limit on the size of the data to 16 kilobytes (16kb).
+
+So, this line is saying, "Use the middleware to handle data from HTML forms, and allow for parsing complex objects in the form data. Also, don't accept form data larger than 16kb." It's a way to control how your server processes and limits the size of form data from incoming requests.
+
+***
+***When we send static file to server ***
+
+
+Absolutely, let's break down `app.use(express.static("public"))` in easy language:
+
+- **`express.static("public")`**: This is a middleware in Express that helps serve static files, like HTML, CSS, images, or JavaScript, directly to the client without any special handling.
+
+- **`"public"`**: This part specifies the folder name where your static files are stored. In this case, it's saying, "Hey, all the static files are in a folder named 'public'."
+
+- **`app.use()`**: This is how you tell your Express application to use this middleware. It's like saying, "Whenever there's a request for a static file, check the 'public' folder and send it to the client."
+
+So, this line is essentially saying, "Use the middleware to serve static files from the 'public' folder to anyone who requests them." It's a convenient way to make your static files accessible to users when they visit your website.
+
+***
+
+**app.use(cookieParser())**
+
+Certainly! Let's break down `app.use(cookieParser())` in easy language:
+
+- **`cookieParser()`**: This is a middleware in Express that helps your server deal with cookies. Cookies are small pieces of data that a website can send to a user's browser, and the browser stores this data for future requests.
+
+- **`app.use()`**: This is how you tell your Express application to use the cookie parser middleware. It's like saying, "Whenever there's a request, check if there are any cookies, and if there are, make them easy to work with."
+
+So, this line is essentially saying, "Use the cookie parser middleware to handle and parse any cookies that come with the requests." It makes dealing with cookies in your Express application much simpler.
+
+
+
