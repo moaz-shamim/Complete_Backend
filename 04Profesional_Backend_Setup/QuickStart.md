@@ -353,6 +353,8 @@ To extract the host information from the connection instance, you can use `conne
 
 It's crucial to consolidate practices to avoid accidentally connecting to different hosts. For example, during development and testing, the database provider may offer different hosts than the production host. This way, by checking the `connectionInstance.connection.host`, you can easily determine the current host to ensure you are connected to the intended environment.
 
+***
+
 **Now, let's proceed to the index.js file in the src folder, where we import and utilize the connection functionality.**
 
 Here we discuss the concept of environment variable env
@@ -369,10 +371,11 @@ For that, we go to the package.json file and navigate to where you write the "de
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
 
+***
 
  ### `connectedDB`
 
-"Remember that we created a `connectedDB` function asynchronously, so we use `dot then` and `catch` from where we call `connectdb`. we call it in index.js 
+"Remember that we created a `connectedDB` function asynchronously, so we use `dot then` and `catch` from where we call `connectdb`. we call it in root index.js 
 
 Keep in mind that when an asynchronous task is completed, it returns promises."
 
@@ -399,7 +402,7 @@ This code is setting up an event listener for errors in the Express application.
 
 In simple terms, this part of the code is saying, "If there's an error in the Express application, log the details of the error, and then stop everything because we can't proceed safely." It's a way to catch and handle errors in the application so that developers can be aware of issues during development or maintenance.
 
-## Now we go to the documentation of ExpressJS we mainly focus on two things in the docs first is request and second is response 
+# Now we go to the documentation of ExpressJS we mainly focus on two things in the docs first is request and second is response 
 
 **`req` object in Express.js:**
 
@@ -684,7 +687,7 @@ Sure, let's break down `app.use(express.urlencoded({extended: true, limit: "16kb
 So, this line is saying, "Use the middleware to handle data from HTML forms, and allow for parsing complex objects in the form data. Also, don't accept form data larger than 16kb." It's a way to control how your server processes and limits the size of form data from incoming requests.
 
 ***
-***When we send static file to server ***
+**When we send static file to server**
 
 
 Absolutely, let's break down `app.use(express.static("public"))` in easy language:
@@ -717,7 +720,7 @@ So, this line is essentially saying, "Use the cookie parser middleware to handle
 
 2. Understanding this concept is crucial because it forms the foundation for learning about middleware.
 
-3. When a client hits a specific URL, like `/moaz`, your server is instructed to send a response using `app.send()`.
+3. When a client hits a specific URL, like `/moaz`, your server is instructed to send a response using `res.send()`.
 
 4. However, it's not as straightforward as just sending a response. There is some processing involved. You don't want everyone who visits your URL to get a response. Therefore, checks are implemented.
 
@@ -1001,7 +1004,7 @@ In simple terms, this class helps in creating consistent and structured response
 
 ***
 
-Certainly! Let's break down HTTP response status codes in easy language:
+**HTTP status codes**
 
 When you make a request to a website (like opening a webpage or submitting a form), the server responds with a status code. This status code is like a short message that tells your browser or application what happened with the request. Here are the main categories of status codes:
 
@@ -1021,3 +1024,512 @@ When you make a request to a website (like opening a webpage or submitting a for
    - This is when the server itself encounters a problem fulfilling your request. It's not your fault; it's something on the server's side. The server might say, "Oops, I made a mistake, and I couldn't process your request."
 
 In summary, HTTP status codes are like quick messages from the server to your browser or application, letting them know how a request went. Successful ones tell you everything is fine, while others provide information about issues or changes. It's a way for computers to communicate about the success or failure of requests on the internet.
+
+
+# User and video model with hooks and JWT
+
+1. In this section, we delve into concepts like data models, specifically focusing on our user model. We also touch on the video model, where we utilize a special plugin that enhances the overall sophistication of our project.
+
+2. This plugin plays a crucial role in elevating the project's level, and we will explore its functionalities in more detail as we progress.
+
+3. Additionally, we delve into writing an advanced-level aggregation pipeline, enhancing our understanding of data manipulation and processing.
+
+4. Another key topic covered is the concept of JSON Web Tokens (JWT) and Bcrypt. We gain insights into their significance and application within our project.
+
+5. Lastly, we briefly touch upon the model, providing foundational knowledge to better comprehend its role in the overall architecture.
+
+***
+
+![Sample Image](./img3.png)
+
+Certainly! Here are the points ordered and free of grammatical mistakes:
+
+1. In the model folder, we create various model files.
+
+2. For the user model, we omit the creation of a data feed ID. MongoDB automatically generates a unique ID when saving the user model in the database, which we can utilize.
+
+3. Within the user model, the "avatar" and "cover image" data fields are designed to be uploaded from a 3rd-party service. We use a string type of data field to store the URL.
+
+4. An essential data field in the user model is "watch history," which contains an object array. Within this array, we push all the video IDs to track the history of watched videos.
+
+5. In the video model, a key data field is "owner" because each video belongs to a specific owner. When displaying the video card, the owner is mentioned, providing additional context, such as "Chai aur Code."
+
+***
+
+The `index: true` option in Mongoose is used to create an index on a particular field in MongoDB. Indexes in MongoDB improve the performance of queries by allowing the database to quickly locate and retrieve documents that match the query criteria. Here's an explanation of why you might use `index: true` on the `username` field in your `userSchema`:
+
+1. **Faster Query Performance:**
+   When you perform queries that involve the `username` field, MongoDB can use the index to quickly locate the relevant documents, rather than scanning the entire collection. This can significantly improve the speed of queries, especially when searching for a specific username.
+
+2. **Enforcing Uniqueness:**
+   By setting `unique: true` along with `index: true`, you are enforcing that the `username` field must have unique values. MongoDB will not allow the insertion of documents with duplicate values for the `username`. This helps maintain data integrity and ensures that each user in your collection has a unique username.
+
+3. **Case-Insensitive Searches:**
+   Since you have set `lowercase: true` on the `username` field, queries for usernames will be case-insensitive. The index on the lowercase version of the `username` field will be more effective in speeding up queries, as it allows MongoDB to perform case-insensitive searches efficiently.
+
+Here's the relevant part of your `userSchema`:
+
+```javascript
+username: {
+  type: String,
+  required: true,
+  unique: true,
+  lowercase: true,
+  trim: true,
+  index: true,
+},
+```
+
+In summary, using `index: true` on the `username` field is a performance optimization that helps make queries involving usernames faster and also enforces the uniqueness of usernames in your MongoDB collection.
+
+We do not include an index attribute in every data field because it affects the overall performance.
+We include an index attribute in the "full name" because we need to perform search operations based on the name.
+
+The "password" field of the user model is declared with the data type as a string. It is a common practice not to store passwords in clear text. If, for any reason, the database is compromised, having clear text passwords can pose a significant problem.
+
+The standard practice is to store passwords in an encrypted format when they are stored in the database. However, encrypting passwords introduces a challenge when it comes to comparison. This is a challenge we need to address as we proceed further.
+
+
+***
+
+**mongoose-aggregate-paginate-v2:**
+
+Now, let's discuss some data fields of the video model, such as "watch history." This field alone completes our project. We write basic MongoDB queries like insert many and update many. Additionally, we use a special package called "mongoose-aggregate-paginate-v2" in Mongoose. This package enables us to write aggregation queries efficiently.
+
+**Aggregate:**
+- In MongoDB, the "aggregate" operation allows you to perform complex data manipulations and transformations on the data stored in the database.
+
+**Paginate:**
+- Pagination is a technique used in web development to break down a large set of data into smaller, more manageable chunks called pages. This is commonly used when displaying data in a user interface.
+
+**mongoose-aggregate-paginate-v2:**
+- This is a specific plugin (additional functionality) for Mongoose that combines the ability to perform complex aggregations (like grouping and transforming data) with built-in support for paginating the results.
+
+**In Detail:**
+- MongoDB is excellent for handling large amounts of data, but sometimes we need to perform advanced operations on that data.
+- The "aggregate" operation in MongoDB is like a power tool for such operations. It allows you to do things like grouping data, calculating averages, and more.
+- Pagination is important when dealing with a lot of data, especially in web applications. Instead of loading all the data at once, you load a chunk (or page) of data at a time.
+- The "mongoose-aggregate-paginate-v2" plugin extends Mongoose, making it easier to perform complex operations on your MongoDB data and handle pagination seamlessly. It simplifies the process of fetching and displaying large sets of data in a structured and organized way.
+
+**In Summary:**
+- "mongoose-aggregate-paginate-v2" is like an enhancement for Mongoose, helping you do advanced operations on MongoDB data and manage pagination effectively, which is crucial when dealing with a large dataset, especially in web applications.
+
+We install and import mongoose aggregate pagination in video model file.
+
+Now we can write queries that belongs to aggregation queries.
+
+***
+
+In Mongoose we can define many middlewares we can also define plugins We can also add third party plugin (additional functionality)  by using plugin method
+
+
+In Mongoose, the `plugin()` method is used to add functionality to a schema. It allows you to extend the capabilities of Mongoose by incorporating external plugins. In your code, you're using the `mongoose-aggregate-paginate-v2` plugin, and here's what it does:
+
+```javascript
+videoSchema.plugin(mongooseAggregatePaginate);
+```
+
+- **`videoSchema`**: This is your Mongoose schema for the "Video" model. It defines the structure and properties of your video documents in the MongoDB database.
+
+- **`plugin()` method**: This method is used to add a Mongoose plugin to your schema. A Mongoose plugin is a piece of reusable code that can be applied to one or more schemas to extend or modify their behavior.
+
+- **How to Use the Plugin**:
+  - You call the `plugin()` method on your schema (`videoSchema`), passing in the desired plugin (`mongooseAggregatePaginate`).
+
+In simple terms, the line `videoSchema.plugin(mongooseAggregatePaginate);` is like telling Mongoose, "Hey, I want to use this cool plugin that helps with pagination when I'm working with aggregations on the 'Video' schema." It extends the capabilities of your schema to efficiently handle paginated queries, making it easier to manage and display large sets of video data in your application.
+
+
+***   
+### Middleware:
+
+**In Simple Terms:**
+- Middleware is like a helpful assistant that jumps in at specific moments in a process.
+- Imagine you're baking a cake, and before putting it in the oven, someone checks the ingredients or adds a special flavor. That checking or adding of flavor is like middleware in a process.
+
+**Example:**
+- When you're handling a request in a web application, middleware can step in before the actual processing to do things like checking if the user is authenticated, logging information, or modifying the data.
+
+**Why it's Useful:**
+- It allows you to customize and enhance how certain tasks are performed without cluttering the main part of your code.
+- Helps in organizing and structuring your code, especially in complex applications.
+
+### Pre and Post Hooks:
+
+**In Simple Terms:**
+- Pre-hooks are like things you do before an event (like baking preparation before putting the cake in the oven).
+- Post-hooks are like things you do after an event (like decorating the cake after it's baked).
+
+**Example:**
+- In a database, before saving data, you might want to validate it (pre-hook). After saving, you might want to log the operation or send a notification (post-hook).
+
+**Why it's Useful:**
+- Gives you control over what happens before or after a particular action, letting you execute specific tasks in a sequence.
+
+### Schema Level:
+
+**In Simple Terms:**
+- Think of a schema as a blueprint or a plan for how your data should look.
+- Middleware can be set at the schema level, meaning it's part of the plan for how your data is handled.
+
+**Example:**
+- If you have a schema for users, middleware at the schema level could be used to run specific tasks whenever you're dealing with user data, like hashing passwords before saving them.
+
+**Why it's Useful:**
+- Keeps your code organized and makes sure certain tasks are applied consistently whenever you're dealing with specific types of data.
+
+### Writing Plugins:
+
+**In Simple Terms:**
+- A plugin is like an additional feature or tool that you can easily add to your system.
+- Middleware is useful for writing these plugins because it allows you to hook into different parts of the process.
+
+**Example:**
+- You might have a middleware that checks for duplicate emails when a new user signs up—a plugin that adds an extra layer of validation.
+
+**Why it's Useful:**
+- Makes your code modular and extensible. You can add or remove features without messing up the core functionality.
+
+In Summary:
+Middleware is a versatile tool that helps you customize, control, and enhance different parts of your code. It's like having a helpful assistant that steps in at specific times to make sure everything is just right.
+
+***
+
+
+### Use Cases:
+
+Middleware is handy for breaking down and organizing your code. Here are some examples:
+
+- **Complex Validation:**
+  - You can use middleware to perform intricate checks or modifications to your data before saving.
+
+- **Removing Dependent Documents:**
+  - For example, if removing a user should also remove all their associated blog posts, you can use middleware to handle this automatically.
+
+- **Asynchronous Defaults:**
+  - Set default values for your data that might involve asynchronous operations.
+
+- **Asynchronous Tasks Triggered by an Action:**
+  - Perform certain tasks asynchronously when a specific action is triggered, like sending emails after a user is saved.
+
+In essence, middleware is like a set of customizable and reusable tasks that you can plug into different parts of your data-handling process. It helps keep your code organized and your logic modular.
+
+
+***
+
+Certainly! Let's break down "Post Middleware" in easy language:
+
+### Post Middleware in Mongoose:
+
+When working with a database using Mongoose, there are times when you want to perform certain tasks after a specific operation, like saving or deleting data. That's where "post middleware" comes into play.
+
+1. **Execution After Operations:**
+   - Post middleware runs after a particular operation, such as saving, deleting, or initializing a document in the database.
+
+2. **Event Hooks:**
+   - You can set up post middleware for specific events. For example, you might want to perform actions after a document is initialized, validated, saved, or deleted.
+
+    ```javascript
+    schema.post('init', function(doc) {
+      console.log('%s has been initialized from the db', doc._id);
+    });
+
+    schema.post('validate', function(doc) {
+      console.log('%s has been validated (but not saved yet)', doc._id);
+    });
+
+    schema.post('save', function(doc) {
+      console.log('%s has been saved', doc._id);
+    });
+
+    schema.post('deleteOne', function(doc) {
+      console.log('%s has been deleted', doc._id);
+    });
+    ```
+
+3. **Examples of Post Middleware Events:**
+   - **'init':** Triggered when a document is initialized from the database.
+   - **'validate':** Triggered after a document is validated but before it's saved.
+   - **'save':** Triggered after a document has been successfully saved.
+   - **'deleteOne':** Triggered after a document has been deleted.
+
+### Easy Language Explanation:
+
+Post middleware is like a set of instructions you provide for what should happen after certain actions with your data in the database.
+
+- If you want to do something after a document is retrieved from the database (`'init'`), you set up post middleware for that.
+- If you want to perform tasks after a document is validated but before it's saved (`'validate'`), post middleware is your go-to.
+- Similarly, you can set up post middleware for actions like after saving (`'save'`) or after deleting (`'deleteOne'`) a document.
+
+In essence, post middleware lets you define actions that should take place once a specific operation on your data has successfully completed. It's a way to do things automatically and consistently after important events in your database interactions.
+
+## Now we go to user model file and here we discuss about some packages like bcrypt and JWT 
+   
+1. The first package is Bcrypt. Bcrypt is a core package of Node.js. Another package that functions similarly to Bcrypt is named Bcrypt.js. However, in this context, we use the Bcrypt package.
+
+Absolutely! Let's break down the usage of `bcrypt` in easy language:
+
+### Using Bcrypt for Passwords:
+
+Imagine you're a secret agent, and you need a way to lock and unlock your secret files securely. In the world of web development, passwords are like those secret files, and `bcrypt` is your trustworthy lock and key.
+
+ **Getting Started:**
+   - First, you need to get your secret weapon—`bcrypt`. It's like a magical tool that helps you turn passwords into something super secure.
+
+    ```javascript
+    const bcrypt = require('bcrypt');
+    const saltRounds = 10;
+    const myPlaintextPassword = 's0/\/\P4$$w0rD';
+    const someOtherPlaintextPassword = 'not_bacon';
+    ```
+
+ **Hashing a Password:**
+   - Hashing is like turning your normal password into a secret code that's hard to crack. There are a couple of ways to do it.
+
+   - **Technique 1 (Generate a Salt and Hash):**
+     - Think of a "salt" like an extra layer of secret sauce. It's something unique that adds more security.
+
+    ```javascript
+    bcrypt.genSalt(saltRounds, function(err, salt) {
+        bcrypt.hash(myPlaintextPassword, salt, function(err, hash) {
+            // Now, 'hash' is the secret code. Store it safely in your secret files (database).
+        });
+    });
+    ```
+
+   - **Technique 2 (Auto-generate a Salt and Hash):**
+     - If you're feeling lazy, you can let `bcrypt` handle the salt for you.
+
+    ```javascript
+    bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
+        // The 'hash' is ready! Store it safely in your secret files (database).
+    });
+    ```
+
+  **Checking a Password:**
+   - When someone comes knocking and claims they know the secret password, you need to check if they're legit.
+
+    ```javascript
+    // Assuming you've loaded the 'hash' from your secret files (database).
+    bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
+        // If 'result' is true, the password is correct. Open the secret files!
+    });
+
+    // Checking with a different password.
+    bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
+        // If 'result' is false, this password is not the key. Keep the secret files locked!
+    });
+    ```
+
+In simple terms, `bcrypt` helps you turn passwords into secret codes that are hard to figure out. It's like locking your secret files with a special key, and only those who know the right password can unlock them. Security at its finest!
+
+2. The problem we encounter with clear text passwords is resolved by using bcrypt plugins. To perform encryption, we cannot directly encrypt our data. Instead, we use encryption with the help of Mongoose hooks, specifically the "pre" hook.
+
+**Pre Middleware in Mongoose:**
+Imagine you are working with a database using Mongoose (a library for MongoDB). In Mongoose, you often want to do some tasks just before saving data into the database. This is where "pre middleware" comes in.
+
+1. **Using Callbacks (before Mongoose 5.x):**
+   - You can set up pre middleware that runs before saving data.
+   - For example, you might want to do something before saving a new document, like modifying the data or checking conditions.
+   - The `next()` function is used to move to the next middleware or continue with the save operation.
+
+    ```javascript
+    schema.pre('save', function(next) {
+      // do stuff
+      next();
+    });
+    ```
+
+2. **Using Promises (Mongoose 5.x and above):**
+   - In newer versions of Mongoose, you can use a function that returns a promise instead of manually calling `next()`.
+   - This makes the code cleaner and more readable, especially when dealing with asynchronous tasks.
+
+    ```javascript
+    schema.pre('save', function() {
+      return doStuff().then(() => doMoreStuff());
+    });
+
+    // Or, using async/await (for Node.js >= 7.6.0)
+    schema.pre('save', async function() {
+      await doStuff();
+      await doMoreStuff();
+    });
+    ```
+
+3. **Preventing Further Execution with `next()`:**
+   - When you call `next()`, it doesn't stop the rest of the code in your middleware from running. 
+   - If you want to prevent further execution based on a condition, you can use the early return pattern.
+
+    ```javascript
+    schema.pre('save', function(next) {
+      if (foo()) {
+        console.log('calling next!');
+        // `return next();` ensures the rest of this function doesn't run
+        return next();
+      }
+      // Unless you comment out the `return` above, 'after next' will print
+      console.log('after next');
+    });
+    ```
+
+
+3. Inside the "pre" hook, we need to define an event and a callback. It's important not to use an arrow function as the callback because arrow functions lack knowledge of the context; they do not have a "this" reference. In this case, we need to be aware of the context because the event is running for the user model, and we need access to the data field. Therefore, we use a traditional function method in this scenario.
+
+
+4. The encryption process is a bit complex, and it takes time. To handle this, we use async/await. In the function arguments, we need to include a method because it is middleware, and in middleware, access to the "next" is compulsory. Finally, we must call the "next" method at the end to pass the flag further.
+
+5. Now, a problem arises when the user data is saved. Every time the data is saved, the password is encrypted. For instance, if someone makes changes to the avatar data field, since it is pre-hooked, the password gets rehashed. To address this, we apply a condition: the hashing work is performed only when a modification is made in the password field. If there is no modification in the password, then it is not hashed.
+
+```js
+//Encryption of password
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = bcrypt.hash(this.password, 10);
+  next();
+});
+```
+
+Here, we need to access the "isModified()" method to check if a field is modified or not. In this case, we pass the data field name as a string.
+
+***
+
+Whenever we import the user model, we need to verify if the password is correct. Since users send us passwords in string format and our server stores encrypted passwords, we match the user's provided password with the hashed password on our server to authenticate.
+
+1. We've created a custom method for authentication.
+
+```js
+//Cpmparision of password
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+```
+
+2. In the schema, there is a methods property in the Schema, where we can add our custom method like `isPasswordCorrect`.
+
+3. The decrypt library assists us in checking passwords through the `compare()` method.
+
+4. The compare method of Bcrypt returns true if the password and encrypted password are the same and false if they are different.
+
+## Now, we learn and understand the concept of JWT (JSON Web Tokens).
+
+1. JWT is a bearer token, meaning that anyone possessing this bearer token can receive data. It acts as a key, and the JWT library generates this token, providing it to us. However, JWT requires some variables.
+
+Let's break down the usage of `jsonwebtoken` in easy language:
+
+### JSON Web Tokens (JWT) with `jsonwebtoken`:
+
+Imagine you have a magical way of encoding information securely so that only those with the right key can decode and understand it. That's what JSON Web Tokens (JWT) do, and `jsonwebtoken` is like the wizard helping you create and verify these tokens.
+
+ **Creating a JWT (Signing):**
+   - When you want to create a JWT, you use the `sign` function. It's like creating a special coded message that only you and those with the secret key can understand.
+
+    ```javascript
+    const jwt = require('jsonwebtoken');
+
+    // Your data or payload (can be anything like user details)
+    const payload = { username: 'Alice', role: 'admin' };
+
+    // Your secret key to encode and decode the JWT
+    const secretKey = 'mySecretKey';
+
+    // Options for customization (you can set expiration time, etc.)
+    const options = { expiresIn: '1h' };
+
+    // Creating the JWT
+    const token = jwt.sign(payload, secretKey, options);
+
+    // Now 'token' is like a special coded message with your data.
+    ```
+
+   - The `token` is what you can share or use for secure communication. It's like a magic stamp that only the ones with the key can validate.
+
+ **Options for Customization:**
+   - You can customize your token using options. For example, you can set an expiration time (how long the token is valid), audience, issuer, and more.
+
+   - Example: Setting expiration time to 2 days
+
+    ```javascript
+    const options = { expiresIn: '2 days' };
+    ```
+
+ **Verifying a JWT:**
+   - When someone presents a JWT to you, you want to make sure it's legitimate. You use the `verify` function for that.
+
+    ```javascript
+    // Assuming 'token' is the JWT presented to you
+    jwt.verify(token, secretKey, function(err, decoded) {
+        if (err) {
+            // Token is not valid!
+            console.error('Invalid token:', err.message);
+        } else {
+            // Token is valid! 'decoded' contains the decoded information.
+            console.log('Decoded token:', decoded);
+        }
+    });
+    ```
+
+   - This is like using your special key to check if the magic stamp is genuine. If it is, you get access to the information inside.
+
+In simpler terms, `jsonwebtoken` is your helper in creating and verifying secure coded messages (JWT). It's like a wizard that uses a special key to create stamps with your information, and later, you can use the key to check if someone else's stamp is genuine. It's all about keeping information safe and secure!
+
+2. However, JWT requires some variables. Like Accesss/Refresh token secret code, we can generate a long and strong code by using different algorithms, such as SHA256. Alternatively, you can also write a random code, and the tokens & tokens expiry is defined in our env file.
+
+3. We briefly discuss the concept of a refresh token. Notably, we do not store access tokens in the database; only refresh tokens are stored. The reasons for this will be discussed further.
+
+4. Yes, we can create a method to generate an access token using user schema methods functionality. We have the flexibility to inject any number of methods into our schema.
+
+```js
+// Generate Access Token
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      username: this.username,
+      fullName: this.fullName,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    }
+  );
+};
+```
+
+5. Both the refresh token and access token are JWT tokens. In JWT, there is a sign method that generates the token.
+
+Certainly! In easy language, the `jwt.sign` method is part of the JSON Web Token (JWT) library, and it's used to create a new JWT. Let's break down what each part of this method does:
+
+```javascript
+jwt.sign(payload, secretOrPrivateKey, [options, callback])
+```
+
+- **`payload`**: This is the data you want to include in the JWT. It's usually an object containing information about the user or any other data you want to carry. In your example, the payload includes the user's ID (`_id`), email, username, and full name.
+
+- **`secretOrPrivateKey`**: This is a secret key or a private key used to sign the JWT. It's a piece of information that only your server knows. It's crucial for verifying the authenticity of the JWT later. In your example, the secret is fetched from an environment variable (`process.env.ACCESS_TOKEN_SECRET`).
+
+- **`options` (optional)**: An object that includes additional settings for the JWT, such as the expiration time (`expiresIn`). The `expiresIn` option specifies how long the JWT will be valid, and it's often expressed in seconds or a string like '1d' for one day.
+
+- **`callback` (optional)**: A callback function that will be called once the token is generated. In your example, you're not using a callback, as the token is directly returned.
+
+Putting it all together, the `jwt.sign` method takes your payload data, signs it using a secret key, and produces a unique and verifiable token. This token can be sent to clients or stored on the server. Later, when the client sends back the token, the server can use the secret key to verify the token's authenticity and extract the original payload.
+
+In your specific use case, `generateAccessToken` is a method on a Mongoose schema that generates a JWT containing information about a user, including their ID, email, username, and full name. This token can then be used for authentication and authorization purposes in your application.
+
+```js
+   sign(
+    {
+      _id: this._id,
+      email: this.email,
+      username: this.username,
+      fullName: this.fullName,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    }
+   );
+```
+
+6. The "_id" we obtain from MongoDB. If desired, you can store only the "_id," and the rest of the information can be retrieved through a database query.
+
