@@ -2101,3 +2101,446 @@ In simple terms, this code sets up Multer to handle file uploads. It specifies t
 ***
 
 Now that we have Multer middleware, if we create controllers and routes, we can easily utilize our Multer middleware when there is a need for file uploading functionality, and these routes involve any files.
+
+
+## All about HTTP 
+
+Here, we discussed HTTP methods, but why not HTTPS? Essentially, the only difference between HTTP and HTTPS lies in the protocol—the technology and communication setup rules are nearly the same.
+
+In HTTP, data is transferred in clear text format, making it susceptible to interception. On the other hand, in HTTPS, an extra layer of security encrypts the data, ensuring that it is readable only by the server and client, preventing any unauthorized access in between.
+
+Key Points:
+
+1. **Protocol Difference:** The primary distinction between HTTP and HTTPS is the protocol used for communication.
+
+2. **Data Encryption:** In HTTPS, data is encrypted, providing an additional layer of security that prevents unauthorized parties from reading the transmitted information.
+
+By implementing HTTPS, websites enhance their security and protect sensitive data during transmission.
+
+***
+
+Some Keywords:
+
+1. **URL (Uniform Resource Locator):**
+   
+    A URL is a web address that specifies the location of a resource on the internet. It is composed of several parts, including the protocol (such as "http" or "https"), the domain (like "www.example.com"), and the specific path to a resource (like "/page.html"). URLs are used to identify and locate resources, such as webpages, images, or files, on the World Wide Web.
+
+    Example: https://www.example.com/homepage.html
+
+2. **URN (Uniform Resource Name):**
+
+    A URN is a Uniform Resource Identifier (URI) that is used to identify resources by name in a particular namespace. Unlike a URL, which specifies how to access a resource, a URN is designed to provide a unique and persistent name for the resource, independent of its location. However, the use of URNs is not as widespread as URLs.
+
+    Example: urn:isbn:0451450523 (identifying a book by its International Standard Book Number)
+
+3. **URI (Uniform Resource Identifier):**
+
+    A URI is a generic term for identifying resources on the internet. Both URLs and URNs fall under the broader category of URIs. A URI can be used to identify and access resources through both the name (URN) and the location (URL). In other words, a URL is a type of URI, and a URN is also a type of URI.
+
+    Example: https://www.example.com/page.html (a URL and a URI)
+
+In summary, URLs are a specific type of URI that provides the location of a resource on the web, URNs are a type of URI that provides a persistent name for a resource, and URI is the general term encompassing both URLs and URNs.
+
+
+***
+
+**URI in more detail, using simple language:**
+
+**URI (Uniform Resource Identifier):**
+
+Imagine the internet as a giant city, and everything on it, like websites, documents, and pictures, has its own unique address. URI is like the system we use to label and find things in this city.
+
+1. **URL (Uniform Resource Locator):**
+   
+    - Think of URLs as the complete address for a place in the city. It tells you exactly where something is.
+    - Example: "https://www.example.com/page.html" is like saying, "Go to the website 'www.example.com,' and look for the page called 'page.html.'"
+
+2. **URN (Uniform Resource Name):**
+   
+    - Now, URNs are like name tags. Instead of telling you where something is, they give it a unique name.
+    - Example: "urn:isbn:0451450523" is like saying, "This thing with the name '0451450523' is a book, and it has an International Standard Book Number (ISBN)."
+
+3. **URI (General Idea):**
+   
+    - URI is the overall system that covers both URLs and URNs. It's like the concept of addresses and name tags combined.
+    - Whether you're telling someone where to find something (like a URL) or giving something a unique name (like a URN), you're using URI.
+
+So, URI is the way we keep everything organized on the internet city. We use URLs to navigate to specific places, and URNs to give unique names to things, all under the umbrella term URI.
+
+
+***
+**types of URLs**
+
+URLs (Uniform Resource Locators) can be classified into different types based on their structure and purpose. Here are some common types of URLs:
+
+1. **HTTP/HTTPS URLs:**
+   
+   - **HTTP (Hypertext Transfer Protocol):** Example - http://www.example.com/page.html
+   - **HTTPS (Hypertext Transfer Protocol Secure):** Similar to HTTP but encrypted for secure communication. Example - https://www.example.com/login.html
+
+2. **FTP URLs:**
+   
+   - **FTP (File Transfer Protocol):** Used for transferring files over the internet. Example - ftp://ftp.example.com/files/document.pdf
+
+3. **File URLs:**
+   
+   - **File:** Refers to files on the local system. Example - file:///C:/Documents/document.txt
+
+4. **Mailto URLs:**
+   
+   - **Mailto:** Opens the default email client to compose an email. Example - mailto:info@example.com
+
+5. **Tel URLs:**
+   
+   - **Tel:** Initiates a telephone call when clicked on a mobile device. Example - tel:+123456789
+
+6. **Data URLs:**
+   
+   - **Data:** Embeds data directly into a document. Example - data:image/png;base64,iVBORw...
+
+7. **JavaScript URLs:**
+   
+   - **JavaScript:** Executes JavaScript code. Example - javascript:void(0);
+
+8. **Relative URLs:**
+   
+   - **Relative:** Specifies the location of a resource relative to the current page. Example - ../images/picture.jpg
+
+9. **Anchor URLs:**
+   
+   - **Anchor:** Links to a specific section within a page. Example - http://www.example.com#section2
+
+10. **Query String URLs:**
+    
+    - **Query String:** Includes parameters for dynamic content. Example - http://www.example.com/search?query=term
+
+These are just a few examples, and URLs can vary based on the protocols they use and the types of resources they point to. Each type serves a specific purpose in web navigation, data transfer, or communication.
+
+_It is not always necessary to use HTTP in a URL. A URL represents a specific location on the internet where connections are established. In MongoDB, the URL may include the term "srv."_
+
+***
+
+**HTTP Headers**
+
+**1. Communication Instructions:**
+   - HTTP headers are like messages that your web browser and a server exchange when talking to each other.
+   - They carry important instructions, telling the browser and the server how to handle the communication.
+
+**2. Request Headers:**
+   - When you ask your browser to open a website (like typing a URL), your browser sends a request to the server.
+   - The request headers tell the server information like what kind of browser you're using, what type of data your browser can understand, and sometimes, if you've been to the site before, it might remind the server about your past visits.
+
+**3. Response Headers:**
+   - When the server sends back the webpage you asked for, it includes response headers.
+   - These headers inform your browser about whether everything went well (status code 200) or if there's a problem (like a page not found - status code 404).
+   - They also provide details about the type of data being sent (HTML, images, etc.), how long your browser can keep and use the data (caching), and if the connection should be secure (using HTTPS).
+
+**4. Customization and Security:**
+   - Headers can be customized to make sure that the communication suits the needs of the website and the user.
+   - They also play a role in ensuring secure connections, protecting your data when you interact with a website.
+
+**5. Enhancing User Experience:**
+   - HTTP headers contribute to a smooth and efficient browsing experience by providing essential information and instructions.
+   - They help browsers and servers understand each other better, making sure that the right content is delivered in the right way.
+
+In essence, HTTP headers are like little notes that help your browser and the server communicate effectively, ensuring that your web experience is fast, secure, and tailored to your needs.
+
+Headers contains metadata.
+
+Ex: metadata
+
+response_headers = {
+    'Status Code': '200 OK',
+    'Access-Control-Allow-Origin': '*',
+    'Connection': 'Keep-Alive',
+    'Content-Encoding': 'gzip',
+    'Content-Type': 'text/html; charset=utf-8',
+    'Date': 'Mon, 18 Jul 2016 16:06:00 GMT',
+    'Etag': '"c561c68d0ba92bbeb8b0f612a9199f722e3a621a"',
+    'Keep-Alive': 'timeout=5, max=997',
+    'Last-Modified': 'Mon, 18 Jul 2016 02:36:04 GMT',
+    'Server': 'Apache',
+    'Set-Cookie': 'mykey=myvalue; expires=Mon, 17-Jul-2017 16:06:00 GMT; Max-Age=31449600; Path=/; secure',
+    'Transfer-Encoding': 'chunked',
+    'Vary': 'Cookie, Accept-Encoding',
+    'X-Backend-Server': 'developer2.webapp.scl3.mozilla.com',
+    'X-Cache-Info': 'not cacheable; meta data too large',
+    'X-kuma-revision': '1085259',
+    'x-frame-options': 'DENY'
+}
+
+One interesting thing about metadata is that it is openly available in the header, and we can also create our own headers.
+
+When you send a request, the headers depend on where and how you send the request. Whether you programmatically send the request or use tools like Postman, Thunder client, etc., each may have different request headers. If your browser sends the request, the header will be different.
+
+The same applies to the response. The server responds to your request, and in the response header, the server may send status text such as "OK" or "404 Not Found," indicating the outcome.
+
+***
+
+**What header actually does**
+Headers perform many operations. We will discuss a few, such as caching, authentication, and state management.
+
+### Types of http headers
+
+**representation headers**
+Imagine you're ordering a pizza. The pizza itself is like the resource, and how it's presented to you can vary. For example, you could get a pizza with different toppings, in a small or large size, or even with a special crust.
+
+Now, in the world of the internet, when you request information from a website (like asking for a pizza), you might get that information in different ways or formats. These different ways of presenting the same information are what we call "representations."
+
+So, representation headers are like labels on your pizza box that tell you how the information inside is presented. Here are some important labels:
+
+1. **Content-Type:** This tells you the type or format of the information. Is it like a plain text document, a picture, or maybe a video? Just like knowing if your pizza is pepperoni or veggie.
+
+2. **Content-Encoding:** Sometimes, the information is compressed or encoded in a special way for efficient delivery. It's like getting your pizza in a sealed box to keep it fresh.
+
+3. **Content-Language:** Just as you might prefer your pizza with instructions in English or Spanish, this header tells you in which language the information is presented.
+
+4. **Content-Location:** This helps you know where the information is coming from, like the address of the pizza place. It's useful if you want more or specific details.
+
+So, when you browse the internet, your web browser and the server communicate using these "representation headers" to make sure you get the information in the way you prefer – just like getting the pizza with your favorite toppings, in the right size, and at the right location!
+
+***
+
+**payload headers**
+
+Imagine you're sending a package (payload) to a friend through the mail. You want to make sure your friend receives the package intact and knows exactly what's inside.
+
+In the world of the internet, when you're sending or receiving information (like a webpage), there are headers that help ensure the safe transport and proper reconstruction of that information. These headers are like special notes attached to your package.
+
+1. **Content-Length:** This is like telling your friend the exact size of the package. It helps the recipient know how much information to expect, so they're ready to handle it.
+
+2. **Content-Range:** Sometimes, the information you're sending is too big to fit in one package. Content-Range helps in situations where you're sending a part of the information in this package and more parts in other packages. It's like saying, "This package contains pages 5 to 10 of the book."
+
+3. **Trailer:** Imagine you attach a checklist at the end of your package listing all the items inside. Trailer does something similar; it provides additional information about the payload at the end of the message.
+
+4. **Transfer-Encoding:** This is like explaining how the package is wrapped or encoded for transport. It could be like saying, "I've used bubble wrap to protect the contents during shipping."
+
+So, these payload headers are like instructions and information attached to your internet messages. They help ensure that the information (or package) is sent and received correctly, whether it's a small piece or a large set of data.
+
+***
+
+**Accept headers**
+
+Imagine you walk into an ice cream shop, and there are many flavors available. The "Accept" request in the HTTP header is like you telling the ice cream shop which flavors you like or understand. You might say, "I like chocolate, vanilla, and strawberry."
+
+Now, in the internet world, when your web browser asks a website for information (like a webpage or a picture), it also tells the server what types of information it can handle or "understand." This is done through the "Accept" header in the request.
+
+For example, if your browser is asking for a webpage, it might say, "I prefer HTML." If it's fetching an image, it might say, "I'm good with JPEG or PNG."
+
+The server then looks at your preferences and decides on the best way to send the information back to you. It's like the ice cream shop giving you chocolate ice cream because that's what you prefer.
+
+So, the "Accept" header is like your browser's way of saying, "Here are the types of information I can handle. Please send me something that fits my preferences." It helps in making sure you get content that your browser can properly understand and display.
+
+***
+
+**User-Agent headers**
+Imagine you're entering a party, and the host wants to know a bit about you before letting you in. The "User-Agent" request header in the online world is somewhat like introducing yourself to a website or server.
+
+When your web browser (like Chrome, Firefox, or Safari) wants to get information from a website, it sends a little note along with the request. This note is called the "User-Agent" header.
+
+This note tells the website a few things about your browser and the device you're using. It's like saying, "Hi, I'm using Chrome on a Windows computer" or "Hey there, I'm Safari on an iPhone."
+
+Why does it do this? Well, websites want to provide you with the best experience possible. Knowing what kind of device and browser you're using helps them show you content that works well for your setup. It's like making sure the party music is something everyone can enjoy, no matter what music player they have.
+
+So, the "User-Agent" is your browser's way of politely introducing itself to the website, allowing the site to tailor the content for the best experience on your device.
+
+***
+
+**Authorization headers**
+
+Imagine you are trying to enter a secret club, and there's a bouncer at the door. To get in, you need to prove you're a member. In the online world, the "Authorization" header is like showing a special pass or secret handshake to access protected stuff on a website.
+
+Here's how it works:
+
+1. **First Attempt:** When you try to access something on a website that's protected, it's like trying to enter the secret club without showing your pass. The server says, "Wait, you need to prove you're allowed to see this."
+
+2. **Server's Response:** The server then sends back a message (like a bouncer saying, "You can't enter without the secret code!"). This message includes a special header called "WWW-Authenticate," which tells your browser what kind of proof (authentication) it accepts.
+
+3. **Getting the Secret Code:** Your browser, being a good friend, figures out the best way to prove you're allowed in. It might prompt you to enter a username and password – this is like you getting the secret code.
+
+4. **Second Attempt:** Now, armed with the secret code (your credentials), your browser makes another request to the server. But this time, it includes an "Authorization" header with the proof (your credentials) you've provided.
+
+5. **Access Granted:** If your proof checks out, the server opens the door (gives you access to the protected stuff). If not, it might say, "Sorry, wrong code."
+
+So, in simple terms, the "Authorization" header is your browser's way of proving it's allowed to access the special, protected areas of a website by providing the right credentials (like a username and password).
+
+***
+
+**Content-Type headers**
+
+**Content-Type: What Kind of Information Is This?**
+
+Think of the internet like a big library with different types of books - some are novels, some are comics, and some are dictionaries. When your web browser requests information from a website, it uses a special note called the "Content-Type" to tell the server what kind of information it's expecting or sending.
+
+**In Simple Words:**
+
+1. **When You Ask for Information:** If you're asking for a webpage, your browser might say, "I want HTML content," or if it's a picture, it might say, "I'm looking for a JPEG image."
+
+2. **When the Server Responds:** When the server sends the information back, it uses the Content-Type header to say, "Here is an HTML webpage" or "Here's a PNG image."
+
+3. **Why Does It Matter?** It's like making sure you get the right kind of book from the library. If you want a story (HTML), you don't want a cookbook (PDF). The Content-Type helps browsers know how to handle and display the information they receive.
+
+**Example:**
+- You request a webpage, and your browser says, "I prefer HTML."
+- The server replies, "Sure, here's an HTML webpage," and it includes the Content-Type header to confirm the type of content.
+
+So, Content-Type is like a label on the internet's library books, making sure your browser understands and shows the information correctly.
+
+***
+
+**cookie headers**
+
+**Imagine You're at a Cafe:**
+
+You walk into a cafe, and the friendly server gives you a little card. Every time you order something, the server notes it down on your card. The next time you come in, they recognize you and know what you like.
+
+**Now, in the Internet World:**
+
+When you visit a website, it can give your web browser a little virtual card, called a "cookie." This cookie keeps track of things you do on that website, like what items you put in your shopping cart or your language preference.
+
+**Here's how it works:**
+
+1. **Getting the Cookie:** The website tells your browser, "Hey, I'm giving you a virtual card (cookie) to remember you."
+
+2. **Storing Information:** As you click around the site, your browser keeps track of the things you do and stores this info on the virtual card (cookie).
+
+3. **Returning to the Website:** The next time you visit that site, your browser hands back the virtual card (cookie) to the website. The site then knows, "Ah, this is the same person who likes these items."
+
+**A Few Points:**
+
+- **Optional:** You can decide not to take the virtual card (block cookies), just like you might say, "No, thanks" to the server's card at the cafe.
+
+- **Privacy Settings:** Your browser might have privacy settings that control whether it accepts or rejects these virtual cards (cookies).
+
+So, in simple terms, a cookie is like a virtual card that helps websites remember you and your preferences. It makes your online experience smoother, but you can decide whether or not to accept it based on your privacy preferences.
+
+***
+
+**Cache-Control headers**
+
+**Imagine You're at a Library:**
+
+You go to a library to borrow a book. When you borrow it, you might notice a note on the book that says how long you can keep it. Let's say it's a library rule that you can keep the book for a week.
+
+**Now, in the Internet World:**
+
+When you visit a website, your browser "borrows" information like pictures, styles, and scripts to show you the webpage. The Cache-Control is like the library rule for how long your browser should "keep" or "remember" these borrowed things.
+
+**Here's how it works:**
+
+1. **Borrowing Information:** When you visit a website, your browser asks for and gets different pieces of information (like images, styles, and scripts) to show you the webpage.
+
+2. **Cache-Control Instructions:** The Cache-Control header comes with these pieces of information and tells your browser how long it can keep and use them without asking the website again.
+
+   - If the Cache-Control says "max-age=3600," it means your browser can keep and use that information for an hour.
+   - If it says "no-store," it means your browser shouldn't keep it at all and should ask for it again next time.
+
+**Benefits:**
+
+- **Faster Loading:** If your browser can keep and reuse certain information, it can load the webpage faster because it doesn't have to ask for everything again.
+
+- **Saving Resources:** It helps save internet resources because your browser doesn't need to download the same things every time you visit a page.
+
+**Example:**
+- You visit a news website, and the images have a Cache-Control saying "max-age=3600" (1 hour). This means your browser can keep those images for an hour, making it faster to load the next news article.
+
+So, Cache-Control is like the rules your browser follows about how long it can keep and use the information it borrows from websites.
+
+***
+
+**Access-Control-Allow-Origin(CORS) headers**
+
+**Imagine You're Inviting Friends to Your House:**
+
+You're hosting a party at your house, and you're deciding who's allowed to come in. Some friends live close by, some far away. The "Access-Control-Allow-Origin" is like a list you have at the entrance that says which friends are allowed to join the party.
+
+**Now, in the Internet World:**
+
+When your web browser is trying to get information from a website (like fetching a picture or some data), it's like asking for permission to enter that website's "house." The website responds with an "Access-Control-Allow-Origin" list, which says which other websites (origins) are allowed to use or display its stuff.
+
+**Here's how it works:**
+
+1. **Requesting Information:** Your browser says, "Hey, I want to use this picture from your website."
+
+2. **Response with Permission:** The website replies with the "Access-Control-Allow-Origin" header, which specifies which websites are allowed to use that picture. If your website is on the list, great! Your browser can display the picture.
+
+3. **No Permission, No Entry:** If your website is not on the list, it's like not being on the invitation list for the party – your browser won't be allowed to display or use that information.
+
+**Benefits:**
+
+- **Security:** It helps websites control who can use their stuff, preventing just anyone from taking and using their pictures or data.
+
+- **Privacy:** It ensures that your information is only shared with websites that the original site trusts.
+
+**Example:**
+- You're on a travel blog (origin A) that wants to show a map from a mapping service (origin B). The mapping service uses the "Access-Control-Allow-Origin" header to say, "Sure, travel blog, you're on my list, you can use my maps!"
+
+So, Access-Control-Allow-Origin is like the bouncer at the entrance, checking the list to see if your website is allowed to use or display information from another website.
+
+***
+
+#### HTTP Methods:
+
+When you use the internet, your web browser and the websites communicate using a set of rules. These rules include different "methods" or ways to ask for things. Imagine these methods as actions you can take:
+
+1. **GET**: It's like asking for information. When you open a website, you're making a GET request to get the webpage.
+
+2. **POST**: It's like submitting information. When you fill out a form on a website, you're making a POST request to send that information.
+
+3. **PUT**: It's like updating something. If you have a profile on a website and you change your password, you're making a PUT request to update your information.
+
+4. **DELETE**: It's like asking to remove something. If you want to delete a post or a picture, you're making a DELETE request.
+
+These are like different tools for different tasks on the internet. Some of them have special properties:
+
+- **Safe**: It means using this method won't change anything on the server. For example, a GET request is safe because it's just asking for information.
+
+- **Idempotent**: It means you can repeat the same request many times, and it will have the same result. For example, if you delete a post using DELETE, deleting it again won't change anything. It's already gone.
+
+- **Cacheable**: It means the response to this request can be saved or "cached" to be used later. This helps make things faster because the same information doesn't need to be fetched every time.
+
+So, these methods are like the different tools you can use when you're interacting with websites, and each tool has its own special use.
+
+
+***
+ **GET**
+
+Imagine you're browsing the internet, and you want to see a specific webpage, like a cat picture. When you type the webpage address in your browser and press enter, your browser is making a "GET request" to the server that hosts the cat picture.
+
+Now, the server understands that you're asking for the cat picture, and it sends it back to your browser. The GET method is like asking for something and getting it in return. Importantly, it's used for requesting data, like web pages, images, or information, but it doesn't send any additional information or change anything on the server side – it's just asking for stuff.
+
+***
+**POST**
+
+When you visit a website and fill out a form, like entering your name and email to sign up for a service, you're likely using a POST request. POST is a way to send information to the website's server.
+
+Imagine you're ordering a pizza online. You fill out the order form with details like pizza size, toppings, and your address. When you click "Order," your browser sends a POST request to the pizza place's server, including all the details you entered.
+
+Now, the server takes this information, processes your order, and might save it in their system. Unlike GET, which is like asking for information, POST is like giving information. It's often used for things that make a change on the server, like submitting forms, posting messages on forums, or adding new users.
+
+Also, there's a technical note about how the information is sent. It could be in a format that looks like key-value pairs (imagine a list of things with labels and values), or it could be in a more complex format when dealing with things like file uploads or richer data.
+
+In simple terms, POST is like submitting a form on the internet to provide information, and it's used when you want to do something that changes the server's data.
+
+***
+
+**HTTP response status codes**
+
+Certainly! Think of HTTP response status codes like messages that web servers send back to your browser after you make a request. These messages tell your browser whether the request was successful or if there was an issue. Here's a simple breakdown:
+
+1. **Informational responses (100 – 199):**
+   - These are like initial updates, telling your browser that things are starting. It's not the final answer, just a way of saying, "I got your request, let's keep going."
+
+2. **Successful responses (200 – 299):**
+   - This is the good news zone! When you see a code in this range, it means your request was successful. For example, if you asked for a webpage, you'll get a "200 OK" message.
+
+3. **Redirection messages (300 – 399):**
+   - Think of these as road signs redirecting your browser. Maybe the webpage you're looking for has moved permanently (like when a site changes its domain) or temporarily (like when a page is under construction).
+
+4. **Client error responses (400 – 499):**
+   - Uh-oh, something went wrong on your end. Maybe you mistyped a web address (getting a "404 Not Found" message) or you're trying to access something you're not allowed to (getting a "403 Forbidden" message).
+
+5. **Server error responses (500 – 599):**
+   - Oops, something went wrong on the server's side. It's like when you order food, and the kitchen has a problem. The server might say, "500 Internal Server Error" – it knows something is off, but it's not sure exactly what.
+
+In summary, these status codes are like a language that helps your browser and the server communicate. They let you know whether everything is fine, if there's a change, or if there's a problem – all in the background while you browse the internet.
