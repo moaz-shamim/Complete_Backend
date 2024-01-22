@@ -2544,3 +2544,118 @@ Certainly! Think of HTTP response status codes like messages that web servers se
    - Oops, something went wrong on the server's side. It's like when you order food, and the kitchen has a problem. The server might say, "500 Internal Server Error" – it knows something is off, but it's not sure exactly what.
 
 In summary, these status codes are like a language that helps your browser and the server communicate. They let you know whether everything is fine, if there's a change, or if there's a problem – all in the background while you browse the internet.
+
+## Router and Controller:
+
+In this section, we write controllers, and the more code we write for controllers, the more our logic-building skills increase. In this specific part, we will focus on the registration process. However, this process encompasses several subparts, and we will address them step by step.
+
+Our basic setup is complete; all the backend tasks are finished up to this point. Now, we will delve into the specifics of writing controllers, covering aspects such as user registration, login, video uploading, listing, query writing, and the utilization of the aggregation framework.
+
+In the past, we wrote a helper function called `asynchandler` to manage promises. Here in controllers, if we write an async function, we cannot create a comprehensive function to handle promises. Instead, we use the helper function `asyncHandler` to manage asynchronous operations, so we import this.
+
+```js
+import { asyncHandler } from "../utils/asyncHandler.js";
+
+const registerUser = asyncHandler(async (req, res) => {
+  res.status(200).json({
+    message: "Hey there this is my first API testing",
+  });
+});
+
+export { registerUser  }; 
+```
+
+Here, we create the `registerUser` method, which is solely responsible for registering users. 
+
+Our next step involves creating routes. While we have defined methods, these methods are executed when a specific URL is accessed. To organize our URLs, we place them in a separate folder named "routes," keeping all our route definitions inside that folder.
+
+```js
+import { Router } from "express";
+import { registerUser } from "../controllers/user.controller.js";
+
+const router = Router();
+
+router.route("/register").post(registerUser);
+
+export default router;
+```
+
+Within the "routes" folder, we create various route files. The process of creating a router and exporting it is an interesting concept.
+
+***
+
+One interesting aspect is the file in which we import the routes. Typically, we import them in the index file, but to keep our index file clean, we import them in the app.js file. However, we don't import the routes at the top of the file, as is the usual practice with other imports. Instead, we import them after configuring the middleware. This is considered the standard approach.
+
+```js
+//routes import
+import userRouter from './routes/user.routes.js'
+
+
+//routes declaration
+app.use("/api/v1/users",userRouter)
+
+// http://localhost:8000/api/v1/users/register
+
+
+export { app };
+```
+
+***
+
+**Now we see the usage of routes:**
+
+We cannot use it as we do with Chai or deploy using `app.get()`. 
+
+No, we cannot declare it like this. When working with routes, we follow a different industry practice. We can easily call `app.get()` when routes and controllers are written in the same place.
+
+However, in our current setup, where we handle these aspects separately, we need to bring in a middleware to incorporate the routes.
+
+Due to the middleware you implemented, if a user types "/user," you transfer control to the user route. The user route then goes to the `user.routes.js` file, indicating that it passes control to this file. 
+
+Here, it can determine the specific route the user is directed to by using the `router.route` method. In the `post` method of this route, the `registerUser` function is executed.
+
+```js
+const registerUser = asyncHandler(async (req, res) => {
+  res.status(200).json({
+    message: "Hey there this is my first API testing",
+  });
+});
+
+```
+
+Our new URL is http://localhost:8000/api/v1/users/register , users is prefix here.
+
+Now, suppose we want to implement login functionality. We navigate to the login route of our URL, so we use `router.route` with "login" as the parameter in the user router.js file. We then utilize the `post` method for login by calling `post` and specifying the login method.
+
+***
+
+**API Versions**
+Including `/api/v1/` in a route is a common convention in web development, especially in the context of building RESTful APIs. Let me break down why this is done:
+
+1. **Namespace and Versioning:** The `/api/v1/` prefix serves as a namespace for your API. It helps organize your API routes and differentiates them from other parts of your application. The version number (`v1` in this case) indicates which version of the API you are using.
+
+    - **Namespace:** It's like creating a dedicated area for all your API-related routes. This is especially important in larger applications where you might have routes for various purposes (e.g., web pages, static assets, API endpoints). Separating API routes using a namespace makes it clear that these routes are specifically for your API.
+
+    - **Versioning:** APIs may undergo changes over time. By including a version number in the route (`/api/v1/`), you can release updates without breaking existing clients. When you introduce breaking changes, you can create a new version (e.g., `/api/v2/`) while keeping the old version accessible for existing clients until they can update.
+
+2. **Clarity and Readability:** Including `/api/v1/` in the route provides clarity to developers and other stakeholders. It clearly indicates that the following routes are part of an API, and the versioning helps manage changes over time.
+
+3. **Consistency:** Following conventions in web development is crucial for consistency. When developers see `/api/v1/`, they understand that these routes are likely related to the API, and they can follow the same pattern when designing future versions.
+
+Example:
+
+```javascript
+// Express route with /api/v1/ namespace
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/posts', postRouter);
+```
+
+In the example above, routes for users and posts are part of the API and are versioned under `/api/v1/`. This structure makes the API's purpose and version clear and contributes to better organization and maintainability.
+
+***
+
+
+Now, we check if our Controllers that we wrote is working or not through Postman.
+
+
+
