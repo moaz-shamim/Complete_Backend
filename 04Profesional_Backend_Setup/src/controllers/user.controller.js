@@ -238,8 +238,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged Out"));
 });
 
-// "Functionality for Updating Tokens"
-const refreshAccessToken = async () => {
+// Functionality for Updating Tokens
+const refreshAccessToken = asyncHandler(async (req, res) => {
   // Extract Refresh token from the request object, which may be in cookies or the request body
   const incomingRefreshToken =
     req.cookies.refreshToken || req.body.refreshToken;
@@ -291,6 +291,141 @@ const refreshAccessToken = async () => {
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid refresh token");
   }
-};
+});
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+//  Functionality to change the user's password
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  // Destructure oldPassword and newPassword from the request body
+  const { oldPassword, newPassword } = req.body;
+  // Fetch the user by ID from the database
+  const user = await User.findById(req.user?._id);
+  // Check if the provided oldPassword matches the stored password
+  const isPasswordCorrect = user.isPasswordCorrect(oldPassword);
+  // If the old password is incorrect, throw an error
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "Invalid old password");
+  }
+  // Set the user's password to the new password
+  user.password = newPassword;
+  // Save the user to the database, bypassing validation checks
+  await user.save({ validateBeforeSave: false });
+  // Send a response indicating that the password has been changed successfully
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
+});
+
+//  Functionality to get Current User
+const getCurrentUser = asyncHandler(async (req, res) => {
+  // Send a response with a status code of 200
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      // Send the user information from the request object
+      req.user,
+      "User fetched successfully"
+    )
+  );
+});
+
+//  Functionality to update account details.
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  // Extract fullName and email from the request body
+  const { fullName, email } = req.body;
+  // Check if fullName and email are provided, otherwise throw an error
+  if (!fullName || !email) {
+    throw new ApiError(400, "All fields are required");
+  }
+  // Update the user's account details in the database
+  User.findById(
+    req.user?._id, // Find the user by their ID in the database
+    {
+      $set: {
+        fullName, //ECMAScript Shorthand for fullName: fullName
+        email: email, // Set the email field to the provided value
+      },
+    },
+    { new: true } // Return the updated user information
+  ).select("-password"); // Exclude the password field from the returned user information
+
+  // Send a response with a status code of 200 and a JSON object
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Account details updated successfully"));
+});
+
+//  updateUserAvatar function handles the process of updating a user's avatar
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  // Get the local path of the uploaded avatar file from the request
+  const avatarLocalPath = req.file?.path;
+
+  // Check if the avatar file is missing; if so, throw an error
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+  // TODO: Delete old image - assignment (a reminder or placeholder for future development)
+  // Upload the avatar to Cloudinary and get the URL
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  // If there's an issue with uploading the avatar, throw an error
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+  // Update the user's avatar URL in the database
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password");
+  // Send a response with a status code of 200 and a JSON object
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar image updated successfully"));
+});
+
+//  updateUserCoverImage function handles the process of updating a user's coverImage
+const updateUserCoverImage = asyncHandler(async (req, res) => {
+  // Get the local path of the uploaded coverImage file from the request
+  const coverImageLocalPath = req.file?.path;
+
+  // Check if the coverImage file is missing; if so, throw an error
+  if (!coverImageLocalPath) {
+    throw new ApiError(400, "Cover image file is missing");
+  }
+  // TODO: Delete old image - assignment (a reminder or placeholder for future development)
+  // Upload the coverImage to Cloudinary and get the URL
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  // If there's an issue with uploading the avatar, throw an error
+  if (!coverImage.url) {
+    throw new ApiError(400, "Error while uploading coverImage");
+  }
+  // Update the user's avatar URL in the database
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        coverImage: coverImage.url,
+      },
+    },
+    { new: true }
+  ).select("-password");
+  // Send a response with a status code of 200 and a JSON object
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Cover image updated successfully"));
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateUserCoverImage,
+};
