@@ -355,6 +355,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 //  updateUserAvatar function handles the process of updating a user's avatar
+
 const updateUserAvatar = asyncHandler(async (req, res) => {
   // Get the local path of the uploaded avatar file from the request
   const avatarLocalPath = req.file?.path;
@@ -387,6 +388,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 });
 
 //  updateUserCoverImage function handles the process of updating a user's coverImage
+
 const updateUserCoverImage = asyncHandler(async (req, res) => {
   // Get the local path of the uploaded coverImage file from the request
   const coverImageLocalPath = req.file?.path;
