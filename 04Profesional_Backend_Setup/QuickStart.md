@@ -3653,3 +3653,560 @@ Explanation:
    - This route is designed to handle the process of refreshing access tokens. In a typical authentication flow using JWTs (JSON Web Tokens), access tokens have a limited lifespan. When they expire, the user can use a refresh token to obtain a new access token without having to log in again. This route facilitates that token refreshing mechanism.
 
 In summary, this specific route is established to handle the refreshing of access tokens, and it delegates the implementation details to the `refreshAccessToken` function in the `user.controller` module. This functionality is crucial for maintaining secure and uninterrupted user sessions.
+
+***
+**Functionality to change the user's password**
+
+```javascript
+//  Functionality to change the user's password
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  // Destructure oldPassword and newPassword from the request body
+  const { oldPassword, newPassword } = req.body;
+  
+  // Fetch the user by ID from the database
+  const user = await User.findById(req.user?._id);
+  
+  // Check if the provided oldPassword matches the stored password
+  const isPasswordCorrect = user.isPasswordCorrect(oldPassword);
+  
+  // If the old password is incorrect, throw an error
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "Invalid old password");
+  }
+  
+  // Set the user's password to the new password
+  user.password = newPassword;
+  
+  // Save the user to the database, bypassing validation checks
+  await user.save({ validateBeforeSave: false });
+  
+  // Send a response indicating that the password has been changed successfully
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
+});
+```
+
+**Explanation:**
+
+1. **Destructuring:**
+   - Extract `oldPassword` and `newPassword` from the request body using destructuring.
+
+2. **Fetch User:**
+   - Retrieve the user from the database based on the user's ID obtained from the request (`req.user?._id`).
+
+3. **Password Verification:**
+   - Check if the provided `oldPassword` matches the stored password for the user. If not, throw an error indicating an invalid old password.
+
+4. **Update Password:**
+   - If the old password is correct, update the user's password to the new password.
+
+5. **Save to Database:**
+   - Save the modified user to the database. The option `validateBeforeSave: false` is used to bypass any validation checks defined in the model.
+
+6. **Send Response:**
+   - Send a JSON response with a status code of 200, an empty object (`{}`), and a success message indicating that the password has been changed successfully.
+
+This functionality ensures that a user can change their password by providing the correct old password and specifying a new one. The updated password is then stored in the database.
+
+***
+
+In Express.js, the `req` object represents the incoming HTTP request. The `req.user` property is not a built-in property of the `req` object in Express. Instead, it is typically added by middleware functions for authentication and authorization purposes.
+
+In many web applications, especially those using token-based authentication (like JSON Web Tokens or JWTs), the `req.user` property is commonly used to store information about the authenticated user. Middleware functions are employed to extract user details from tokens and attach them to the `req` object, making it easily accessible in subsequent middleware or route handlers.
+
+The middleware responsible for adding `req.user` is often executed before the route handlers that require authentication. This middleware typically performs the following steps:
+
+1. **Token Extraction:** Retrieve the authentication token from the request (usually from headers, cookies, or query parameters).
+
+2. **Token Verification:** Validate and verify the authenticity of the token, ensuring it has not been tampered with and is still valid.
+
+3. **User Retrieval:** Using the information from the token, fetch the corresponding user details from the database.
+
+4. **Populating `req.user`:** Attach the user information to the `req.user` property, making it available to subsequent middleware or route handlers.
+
+Here's a simple example:
+
+```javascript
+// Middleware for authenticating and populating req.user
+const authenticateUser = async (req, res, next) => {
+  try {
+    // Extract token from headers, cookies, or other sources
+    const token = req.headers.authorization.replace("Bearer ", "");
+
+    // Verify and decode the token
+    const decodedToken = verifyToken(token);
+
+    // Fetch user details from the database
+    const user = await getUserFromDatabase(decodedToken.userId);
+
+    // Attach user details to req.user
+    req.user = user;
+
+    // Move to the next middleware or route handler
+    next();
+  } catch (error) {
+    // Handle authentication errors
+    res.status(401).json({ error: "Unauthorized" });
+  }
+};
+
+// Example route using the authenticateUser middleware
+app.get("/protected-route", authenticateUser, (req, res) => {
+  // Access authenticated user details using req.user
+  res.json({ user: req.user });
+});
+```
+
+In this example, the `authenticateUser` middleware is added to the route handler for "/protected-route". It extracts the token from the request, verifies it, retrieves user details, and attaches them to `req.user`. This allows the route handler to access the authenticated user's information through `req.user`.
+
+***
+**Functionality to get Current User**
+
+
+```javascript
+// Functionality to get Current User
+const getCurrentUser = asyncHandler(async (req, res) => {
+  // Send a response with a status code of 200
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      // Send the user information from the request object
+      req.user,
+      "User fetched successfully"
+    )
+  );
+});
+```
+
+1. **Function Definition:**
+   - The `getCurrentUser` function is defined to handle the route or endpoint where the application retrieves information about the currently logged-in user.
+
+2. **AsyncHandler Middleware:**
+   - `asyncHandler` is a middleware that simplifies error handling for asynchronous functions in Express. It helps catch errors and pass them to the error-handling middleware.
+
+3. **Request and Response Objects:**
+   - The function takes two parameters: `req` (request) and `res` (response). These objects represent the incoming HTTP request and the server's response, respectively.
+
+4. **Status Code and JSON Response:**
+   - It sends a response with a status code of 200, indicating a successful HTTP request.
+   - The response is in JSON format and includes the following:
+     - An instance of the `ApiResponse` class or object.
+     - The status code `200`.
+     - The user information (`req.user`) obtained from the request object.
+     - A message indicating that the user has been fetched successfully.
+
+5. **ApiResponse Object:**
+   - The `ApiResponse` object seems to be a custom class or structure used to format API responses consistently. It likely includes properties for status code, data, and a message.
+
+6. **Async Function:**
+   - The entire function is wrapped in the `asyncHandler` middleware, indicating that it might involve asynchronous operations. This middleware helps handle any asynchronous errors gracefully.
+
+In summary, this code defines a route handler (`getCurrentUser`) that, when accessed, responds with information about the currently logged-in user. The response includes a status code, user data, and a success message. The `asyncHandler` middleware is used to manage errors effectively in asynchronous operations.
+
+***
+
+**Functionality to update account details.**
+
+```javascript
+// Functionality to update account details.
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  // Extract fullName and email from the request body
+  const { fullName, email } = req.body;
+  // Check if fullName and email are provided, otherwise throw an error
+  if (!fullName || !email) {
+    throw new ApiError(400, "All fields are required");
+  }
+  // Update the user's account details in the database
+  User.findById(
+    req.user?._id, // Find the user by their ID in the database
+    {
+      $set: {
+        fullName, // ECMAScript Shorthand for fullName: fullName
+        email: email, // Set the email field to the provided value
+      },
+    },
+    { new: true } // Return the updated user information
+  ).select("-password"); // Exclude the password field from the returned user information
+
+  // Send a response with a status code of 200 and a JSON object
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Account details updated successfully"));
+});
+```
+
+Explanation:
+
+1. **AsyncHandler Middleware:**
+   - The function is wrapped in the `asyncHandler` middleware, indicating that it handles asynchronous operations with proper error handling.
+
+2. **Request and Response Objects:**
+   - The function takes `req` (request) and `res` (response) objects as parameters. These represent the incoming HTTP request and the server's response, respectively.
+
+3. **Extract Data from Request Body:**
+   - It extracts the `fullName` and `email` from the request body.
+
+4. **Validation:**
+   - It checks if both `fullName` and `email` are provided; otherwise, it throws a `400 Bad Request` error with the message "All fields are required."
+
+5. **Database Update:**
+   - It updates the user's account details in the database using `User.findById`.
+   - It sets the `fullName` and `email` fields to the provided values.
+
+6. **Return Updated User Information:**
+   - The `findById` method has an optional third parameter `{ new: true }`, which means it returns the updated user information.
+   - The `select("-password")` part excludes the password field from the returned user information.
+
+7. **Response to Client:**
+   - It sends a response with a status code of `200` and a JSON object.
+   - The JSON object includes an instance of the `ApiResponse` class with status code `200`, updated user information, and a success message "Account details updated successfully."
+
+In summary, this code handles the update of a user's account details. It ensures that required fields are provided, updates the information in the database, and returns the updated user details in the API response.
+
+***
+**Functionality to update user's avatar**
+
+```javascript
+// Functionality to update user's avatar
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  // Get the local path of the uploaded avatar file from the request
+  const avatarLocalPath = req.file?.path;
+
+  // Check if the avatar file is missing; if so, throw an error
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+
+  // TODO: Delete old image - assignment (a reminder or placeholder for future development)
+
+  // Upload the avatar to Cloudinary and get the URL
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  // If there's an issue with uploading the avatar, throw an error
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+
+  // Update the user's avatar URL in the database
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  // Send a response with a status code of 200 and a JSON object
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar image updated successfully"));
+});
+```
+
+Explanation:
+
+1. **AsyncHandler Middleware:**
+   - The function is wrapped in the `asyncHandler` middleware, indicating that it handles asynchronous operations with proper error handling.
+
+2. **Request and Response Objects:**
+   - The function takes `req` (request) and `res` (response) objects as parameters. These represent the incoming HTTP request and the server's response, respectively.
+
+3. **Get Avatar File Path:**
+   - It gets the local path of the uploaded avatar file from the request.
+
+4. **Validation:**
+   - It checks if the avatar file is missing. If it is, it throws a `400 Bad Request` error with the message "Avatar file is missing."
+
+5. **Upload to Cloudinary:**
+   - It uploads the avatar to Cloudinary, a cloud-based media management platform, using the `uploadOnCloudinary` function.
+   - The `avatar` variable holds the response, including the URL of the uploaded avatar.
+
+6. **Update Avatar URL in the Database:**
+   - It updates the user's avatar URL in the database using `User.findByIdAndUpdate`.
+   - The `$set` operator sets the `avatar` field to the URL obtained from Cloudinary.
+
+7. **Return Updated User Information:**
+   - The `findByIdAndUpdate` method has an optional third parameter `{ new: true }`, which means it returns the updated user information.
+   - The `select("-password")` part excludes the password field from the returned user information.
+
+8. **Response to Client:**
+   - It sends a response with a status code of `200` and a JSON object.
+   - The JSON object includes an instance of the `ApiResponse` class with status code `200`, updated user information, and a success message "Avatar image updated successfully."
+
+In summary, this code handles the process of updating a user's avatar. It uploads the new avatar to Cloudinary, updates the avatar URL in the database, and returns the updated user details in the API response.
+
+***
+
+**Functionality to update user's avatar**
+
+```javascript
+// Functionality to update user's avatar
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  // Get the local path of the uploaded avatar file from the request
+  const avatarLocalPath = req.file?.path;
+
+  // Check if the avatar file is missing; if so, throw an error
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+
+  // TODO: Delete old image - assignment (a reminder or placeholder for future development)
+
+  // Upload the avatar to Cloudinary and get the URL
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  // If there's an issue with uploading the avatar, throw an error
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+
+  // Update the user's avatar URL in the database
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  // Send a response with a status code of 200 and a JSON object
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar image updated successfully"));
+});
+```
+
+Explanation:
+
+1. **AsyncHandler Middleware:**
+   - This function is wrapped in the `asyncHandler` middleware, indicating that it handles asynchronous operations with proper error handling.
+
+2. **Request and Response Objects:**
+   - The function takes `req` (request) and `res` (response) objects as parameters. These represent the incoming HTTP request and the server's response, respectively.
+
+3. **Get Avatar File Path:**
+   - It gets the local path of the uploaded avatar file from the request.
+
+4. **Validation:**
+   - It checks if the avatar file is missing. If it is, it throws a `400 Bad Request` error with the message "Avatar file is missing."
+
+5. **Upload to Cloudinary:**
+   - It uploads the avatar to Cloudinary, a cloud-based media management platform, using the `uploadOnCloudinary` function.
+   - The `avatar` variable holds the response, including the URL of the uploaded avatar.
+
+6. **Update Avatar URL in the Database:**
+   - It updates the user's avatar URL in the database using `User.findByIdAndUpdate`.
+   - The `$set` operator sets the `avatar` field to the URL obtained from Cloudinary.
+
+7. **Return Updated User Information:**
+   - The `findByIdAndUpdate` method has an optional third parameter `{ new: true }`, which means it returns the updated user information.
+   - The `select("-password")` part excludes the password field from the returned user information.
+
+8. **Response to Client:**
+   - It sends a response with a status code of `200` and a JSON object.
+   - The JSON object includes an instance of the `ApiResponse` class with status code `200`, updated user information, and a success message "Avatar image updated successfully."
+
+In summary, this code handles the process of updating a user's avatar. It checks if the avatar file is present, uploads the new avatar to Cloudinary, updates the avatar URL in the database, and returns the updated user details in the API response.
+
+***
+
+**Functionality to update user's avatar**
+
+```javascript
+// Functionality to update user's avatar
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  // Get the local path of the uploaded avatar file from the request
+  const avatarLocalPath = req.file?.path;
+
+  // Check if the avatar file is missing; if so, throw an error
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+
+  // TODO: Delete old image - assignment (a reminder or placeholder for future development)
+
+  // Upload the avatar to Cloudinary and get the URL
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  // If there's an issue with uploading the avatar, throw an error
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+
+  // Update the user's avatar URL in the database
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  // Send a response with a status code of 200 and a JSON object
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar image updated successfully"));
+});
+```
+
+Explanation:
+
+1. **AsyncHandler Middleware:**
+   - This function is wrapped in the `asyncHandler` middleware, indicating that it handles asynchronous operations with proper error handling.
+
+2. **Request and Response Objects:**
+   - The function takes `req` (request) and `res` (response) objects as parameters. These represent the incoming HTTP request and the server's response, respectively.
+
+3. **Get Avatar File Path:**
+   - It gets the local path of the uploaded avatar file from the request.
+
+4. **Validation:**
+   - It checks if the avatar file is missing. If it is, it throws a `400 Bad Request` error with the message "Avatar file is missing."
+
+5. **Upload to Cloudinary:**
+   - It uploads the avatar to Cloudinary, a cloud-based media management platform, using the `uploadOnCloudinary` function.
+   - The `avatar` variable holds the response, including the URL of the uploaded avatar.
+
+6. **Update Avatar URL in the Database:**
+   - It updates the user's avatar URL in the database using `User.findByIdAndUpdate`.
+   - The `$set` operator sets the `avatar` field to the URL obtained from Cloudinary.
+
+7. **Return Updated User Information:**
+   - The `findByIdAndUpdate` method has an optional third parameter `{ new: true }`, which means it returns the updated user information.
+   - The `select("-password")` part excludes the password field from the returned user information.
+
+8. **Response to Client:**
+   - It sends a response with a status code of `200` and a JSON object.
+   - The JSON object includes an instance of the `ApiResponse` class with status code `200`, updated user information, and a success message "Avatar image updated successfully."
+
+In summary, this code handles the process of updating a user's avatar. It checks if the avatar file is present, uploads the new avatar to Cloudinary, updates the avatar URL in the database, and returns the updated user details in the API response.
+
+***
+
+# Understand the subscription Schema:
+
+"Subscription is the channel that contains many users. Subscription is also a user, and a subscriber is also a user."
+"Both are users, but we keep them separately so that we can match the ID for the subscription process.
+
+ Data fields of the subscription schema are as follows:
+- Subscriber:
+  Inside the subscriber, we add a user because a subscriber is a user.
+- Channel:
+  Inside the channel, we add a user because a channel is a user.
+
+Now, we create the subscription model in the model folder. 
+
+The main complexity lies in how we use this model schema. For example, in many places, we have to display user profiles. When we display a user profile, we can show the user's ID, username, and email. However, a problem arises when we try to display subscribers on a channel page. We often see a large number of subscribers, such as 1,000,000. Additionally, when a user is logged in and visits a channel page, they may see a subscribed button. In this context, we need to display whether they are true or false subscribers, so the button appears or disappears.
+
+We discuss in detail the above concepts in this Subscription model."
+
+***
+**subscription.model**
+
+1. **Importing Mongoose:**
+   ```javascript
+   import { Schema, model } from "mongoose";
+   ```
+   Here, the code is importing the `Schema` and `model` objects from the "mongoose" library. Mongoose is a popular library for MongoDB and provides a way to model your application data and interact with the MongoDB database.
+
+2. **Defining a Subscription Schema:**
+   ```javascript
+   const subscriptionSchema = new Schema(
+     {
+       subscriber: {
+         type: Schema.Types.ObjectId,
+         ref: "User",
+       },
+       channel: {
+         type: Schema.Types.ObjectId,
+         ref: "User",
+       },
+     },
+     { timestamps: true }
+   );
+   ```
+   - `subscriptionSchema` is an instance of `Schema` that defines the structure of a subscription document in the MongoDB collection.
+   - It has two fields: `subscriber` and `channel`. Both of these fields store MongoDB ObjectIds, which are references to documents in the "User" collection.
+   - The `ref: "User"` indicates that these fields are references to documents in the "User" collection.
+
+   Additionally, `{ timestamps: true }` specifies that Mongoose should automatically manage `createdAt` and `updatedAt` fields for each document.
+
+3. **Creating a Mongoose Model:**
+   ```javascript
+   export const Subscription = model("Subscription", subscriptionSchema);
+   ```
+   - This line creates a Mongoose model named "Subscription" based on the `subscriptionSchema` definition. 
+   - The model is then exported so that it can be used in other parts of the codebase.
+
+In simpler terms, this code helps define a structure for storing subscription information in a MongoDB database using Mongoose. Each subscription document will have a `subscriber` (who is subscribing) and a `channel` (to whom the subscriber is subscribing). The `timestamps` option ensures that the creation and update times of each document are automatically tracked. The model is exported for use in other parts of the application.
+
+***
+**"In this section, we understand the concept of the database in the context of the subscription schema.**
+
+Here, we delve into the subscription schema in-depth. 
+Our ***next goal is to create a controller using this subscription schema***  and then return the user profile through the `getUserChannelProfile` function."
+
+"Now let's discuss what the `getUserChannelProfile` functionality covers:
+The first element is the cover image, for which we have access.
+The second is the profile image, or "avatar," for which we already have access, along with the user's full name and username. However, we don't have access to the number of subscribers to channels and the number of channels subscribed to by users. We lack information about the subscribers in our database."
+
+***
+**How acn we take access the information about the subscribers ?**
+
+"One more challenge is that whenever we visit YouTube, let's say on a channel like 'Chai or Code,' when you subscribe to this channel, a button is present with 'Subscribed' written on it. However, if you are not subscribed to that channel, a button appears with 'Subscribe' written on it. How do we take access to that functionality?"
+
+***
+"For solving this challenge, we learn some theoretical concepts. We have to understand the structure of the database and learn how to design and use it.
+
+Let's suppose when we are designing the `user` model, we deal with our problem by adding data fields of 'subscriber' and 'channel' of the subscriber model. From here, we can easily access data using the user model.
+
+By creating a 'subscribers' array and adding all these IDs inside that array, we can effectively manage the information. However, suppose someone has a million subscribers; in that case, a million arrays are created. If a value is deleted from the array in between, we encounter issues with data structure and algorithms to handle this large index array. The operations we perform can cost us significantly."
+
+***
+
+"Now, how do we take access to the number of subscribers count? For the number of subscriber counts, we have to design a model structure in our database that provides us with subscription information."
+
+"The Subscribtion model majorly contains two data fields: "subscriber" and "channel." Here, we understand how the Subscribtion model is a separate entity, and then we retrieve data from this model by performing a join operation with the user model. We can then access this data from the Subscribtion model."
+
+***
+
+"In this section, let's understand what this data actually is. In the next section, we will understand how to take access to this data. Now, we move to our `subscription.model.js` file. In this schema, we have two data fields: "subscriber" and "channel." Both data fields are actually users. To differentiate between the two users, we named the first one "subscriber" and the second one "channel." Both data fields contain data from the user model.
+
+Why do we write these two data fields, and why not have them contained in an array?"
+
+***
+
+**Now we understand how this is schema works:**
+
+1. **Introduction to Subscription Schema:**
+   Let's understand the subscription schema. This schema contains two major fields: "subscriber" and "channel." We have only these two values. Let's discuss how the entire model is created and how its document is formed in the datbase, and how many times a document is created.
+
+2. **Document Creation Process:**
+   - Assume some values like : users- A,B,C,D,E and  channels CAC, HCC, FCC. Both the channels and the users are users.
+   - Whenever a document is created in the database, it is structured like a img4 containing two values. This represents a single document.
+   - The number of times a document is created is whenever a user subscribes to a channel.
+
+3. **Example Scenario:**
+   - Suppose a user A is created and subscribes to a channel CAC. A document is created. This document is an object stored in the database.
+   - Another user D comes and subscribes to channel CAC. A new document is created in the database.
+   - Suppose user C subscribes to channels CAC, HCC, and FCC. Three documents are created in the database.
+
+***
+
+**Understanding Subscriber Information:**
+   
+- ***A major concept is how we know the subscribers of a channel.***
+- The documents created store information about the subscribers and the channels they are subscribed to.
+
+"For understanding the subscriber count, we have to select the document that has the channel 'CAC,' not the subscribers. We find a 'channel' data field in the documents that are created."
+
+- ***Another major concept is how we know the number of channel a subscriber subscribed.***
+
+"Let's say User C, you count the documents where the subscriber value is C. We are finding the 'subscriber' data field in the subscription schema document."
