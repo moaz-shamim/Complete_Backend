@@ -4,6 +4,11 @@ import {
   loginUser,
   logoutUser,
   refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateUserCoverImage,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -29,8 +34,6 @@ router.route("/register").post(
   registerUser
 );
 
-export default router;
-
 // Route for user login ("/login")
 // Handles the login functionality provided by the user.controller module
 router.route("/login").post(loginUser);
@@ -43,3 +46,15 @@ router.route("/logout").post(verifyJWT, logoutUser);
 // Route for refreshing access tokens ("/refresh-token")
 // Handles the token refreshing functionality provided by the user.controller module
 router.route("/refresh-token").post(refreshAccessToken);
+
+router.route("/current-user").get(verifyJWT, getCurrentUser);
+
+router.route("/change-password").patch(verifyJWT, changeCurrentPassword);
+
+router.route("/update-account").patch(verifyJWT, updateAccountDetails);
+
+router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
+
+router.route("/update-coverImage").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
+
+export default router;
