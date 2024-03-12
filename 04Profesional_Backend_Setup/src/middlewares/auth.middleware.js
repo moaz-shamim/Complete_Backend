@@ -23,7 +23,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     // Move to the next middleware or route handler
     next();
   } catch (error) {
-    // Handle errors during token <verif></verif>ication or user retrieval
+    // Handle errors during token verification or user retrieval
     throw new ApiError(401, error?.message || "Invalid access token");
   }
 });
