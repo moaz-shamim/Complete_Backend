@@ -3076,7 +3076,7 @@ This mechanism ensures seamless authentication without requiring the user to re-
 
 **Now we go to the user controller file and creating logging user functionality:**
 
-### Algorithm for Regestration Funtionality:
+### Algorithm for Login Funtionality:
 
 1. **Data Retrieval:**
    - Get data from the request body.
