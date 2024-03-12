@@ -144,8 +144,8 @@ const loginUser = asyncHandler(async (req, res) => {
   const { email, username, password } = req.body;
 
   //Check if data like username "AND" email exist in the retrieved data.
-  if (!username && !email) {
-    throw new ApiError(400, "username or email is required");
+  if (!username && !password) {
+    throw new ApiError(400, "username or password is required");
   }
 
   //Check if data like username "OR" email  exist in the retrieved data.
@@ -163,7 +163,7 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   //Check if the password from the request object, matches the stored password in the database for the identified user.
-  const isPasswordValid = user.isPasswordCorrect(password);
+  const isPasswordValid =await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid user credentials");
@@ -300,7 +300,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   // Fetch the user by ID from the database
   const user = await User.findById(req.user?._id);
   // Check if the provided oldPassword matches the stored password
-  const isPasswordCorrect = user.isPasswordCorrect(oldPassword);
+  const isPasswordCorrect =await user.isPasswordCorrect(oldPassword);
   // If the old password is incorrect, throw an error
   if (!isPasswordCorrect) {
     throw new ApiError(400, "Invalid old password");
@@ -337,7 +337,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
   // Update the user's account details in the database
-  User.findById(
+  const user =  await User.findByIdAndUpdate(
     req.user?._id, // Find the user by their ID in the database
     {
       $set: {
